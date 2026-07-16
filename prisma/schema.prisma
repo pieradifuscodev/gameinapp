@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  password            String?
+  name                String
+  surname             String
+  role                String    
+  addressUser         String?
+  latitude            Float?
+  longitude           Float?
+  favoriteSports      String[]  
+  maxNotificationDist Int       @default(20) 
+  
+  createdEvents       Event[]   @relation("EventCreator")
+  participations      Event[]   @relation("EventParticipants")
+  circles             Circle[]  @relation("CircleMembers")
+  ownedCircles        Circle[]  @relation("CircleOwner")
+}
+
+model Event {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  sport        String   
+  dateStart    DateTime
+  location     String
+  latitude     Float
+  longitude    Float
+  maxPlayers   Int
+  status       String   
+  isPrivate    Boolean  @default(false)
+  
+  creatorId    String
+  creator      User     @relation("EventCreator", fields: [creatorId], references: [id])
+  
+  gymId        String
+  gym          Gym      @relation(fields: [gymId], references: [id])
+  
+  circleId     String?
+  circle       Circle?  @relation(fields: [circleId], references: [id])
+  
+  participants User[]   @relation("EventParticipants")
+}
+
+model Gym {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  latitude  Float
+  longitude Float
+  
+  events    Event[]
+}
+
+model Circle {
+  id        String   @id @default(uuid())
+  name      String
+  boardText String?
+  
+  ownerId   String
+  owner     User     @relation("CircleOwner", fields: [ownerId], references: [id])
+  
+  members   User[]   @relation("CircleMembers")
+  
+  events    Event[]
+}
