@@ -64,7 +64,7 @@ export async function GET(req: Request) {
         d."isPrivate",
         d."distanceInKm",
         json_build_object('id', g.id, 'name', g.name, 'address', g.address) AS gym,
-        json_build_object('id', u.id, 'name', u.name, 'surname', u.surname, 'email', u.email) AS creator
+        json_build_object('id', u.id, 'name', u.name, 'surname', u.surname, 'email', u.email, 'role', u.role) AS creator
       FROM calculated_distances d
       JOIN "Gym" g ON d."gymId" = g.id
       JOIN "User" u ON d."creatorId" = u.id
@@ -72,8 +72,27 @@ export async function GET(req: Request) {
       ORDER BY d."distanceInKm" ASC;
     `;
 
-    // 4. Struttura della Risposta HTTP
-    return NextResponse.json({ events }, { status: 200 });
+    // 4. Fetch distinct Gyms nearby (for the popular gyms section)
+    const gyms = await prisma.$queryRaw`
+      SELECT 
+        id, name, address, latitude, longitude,
+        (2 * 6371 * asin(sqrt(
+          power(sin(radians(latitude - ${lat}) / 2), 2) +
+          cos(radians(${lat})) * cos(radians(latitude)) *
+          power(sin(radians(longitude - ${lng}) / 2), 2)
+        ))) AS "distanceInKm"
+      FROM "Gym"
+      WHERE (2 * 6371 * asin(sqrt(
+          power(sin(radians(latitude - ${lat}) / 2), 2) +
+          cos(radians(${lat})) * cos(radians(latitude)) *
+          power(sin(radians(longitude - ${lng}) / 2), 2)
+        ))) <= ${radius}
+      ORDER BY "distanceInKm" ASC
+      LIMIT 10;
+    `;
+
+    // 5. Struttura della Risposta HTTP
+    return NextResponse.json({ events, gyms }, { status: 200 });
   } catch (error) {
     console.error('Errore durante la ricerca geolocalizzata degli eventi:', error);
     return NextResponse.json(

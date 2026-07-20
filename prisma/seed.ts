@@ -20,6 +20,7 @@ async function main() {
     const mario = await prisma.user.create({
         data: {
             email: 'mario.rossi@example.com',
+            username: 'mariorossi88',
             password: 'password_hashed_123', // In produzione usare bcrypt/argon2
             name: 'Mario',
             surname: 'Rossi',
@@ -35,6 +36,7 @@ async function main() {
     const luigi = await prisma.user.create({
         data: {
             email: 'luigi.verdi@example.com',
+            username: 'luigiv99',
             password: 'password_hashed_123',
             name: 'Luigi',
             surname: 'Verdi',

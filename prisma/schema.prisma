@@ -9,9 +9,14 @@ generator client {
 model User {
   id                  String    @id @default(uuid())
   email               String    @unique
+  username            String?   @unique
+  bio                 String?
   password            String?
-  name                String
-  surname             String
+  name                String?
+  surname             String?
+  avatar              String?
+  companyName         String?
+  vatNumber           String?
   role                String    
   addressUser         String?
   latitude            Float?
@@ -28,6 +33,10 @@ model User {
   
   accounts            Account[]
   sessions            Session[]
+
+  followedBy          User[]    @relation("UserFollows")
+  following           User[]    @relation("UserFollows")
+  notifications       Notification[]
 }
 
 model Event {
@@ -46,8 +55,8 @@ model Event {
   creatorId    String
   creator      User     @relation("EventCreator", fields: [creatorId], references: [id])
   
-  gymId        String
-  gym          Gym      @relation(fields: [gymId], references: [id])
+  gymId        String?
+  gym          Gym?     @relation(fields: [gymId], references: [id])
   
   circleId     String?
   circle       Circle?  @relation(fields: [circleId], references: [id])
@@ -111,4 +120,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   
+  title     String
+  message   String
+  link      String?  
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

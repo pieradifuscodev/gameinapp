@@ -4,13 +4,13 @@ import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name, surname, role } = await req.json();
+    const { email, password, role } = await req.json();
 
-    if (!email || !password || !name || !surname) {
+    if (!email || !password) {
       return NextResponse.json({ error: "Tutti i campi sono obbligatori" }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findFirst({
       where: { email }
     });
 
@@ -24,9 +24,17 @@ export async function POST(req: Request) {
       data: {
         email,
         password: hashedPassword,
-        name,
-        surname,
-        role: role || "SPORTIVO", // Ruolo di default
+        role: role || "SPORTIVO",
+      }
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "SYSTEM",
+        title: "Benvenuto su GameInApp! 🎉",
+        message: "Completa il tuo profilo e scopri gli eventi sportivi vicino a te. Non dimenticare di attivare i permessi per le notifiche push per rimanere aggiornato sulle tue partite!",
+        link: "/settings/profile"
       }
     });
 

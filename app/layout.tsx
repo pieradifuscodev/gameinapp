@@ -26,6 +26,10 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import { Providers } from "./providers";
+import BottomNav from "@/components/layout/BottomNav";
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,7 +40,29 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="h-[100dvh] overflow-hidden flex flex-col bg-slate-50 text-slate-900">
+        <Providers>
+          <Toaster position="top-center" toastOptions={{
+            style: {
+              borderRadius: '16px',
+              background: '#333',
+              color: '#fff',
+              fontSize: '14px',
+              fontWeight: '500'
+            },
+            success: {
+              iconTheme: {
+                primary: '#4ade80',
+                secondary: '#fff',
+              },
+            },
+          }} />
+          <main className="flex-1 overflow-y-auto">
+            {children}
+          </main>
+          <BottomNav />
+        </Providers>
+      </body>
     </html>
   );
 }
