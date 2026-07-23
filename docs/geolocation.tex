@@ -1,0 +1,577 @@
+\documentclass[12pt, a4paper]{article}
+
+% ─── Encoding & Language ───────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% ─── Typography ────────────────────────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+
+% ─── Page Layout ───────────────────────────────────────────────────────────────
+\usepackage[
+  top=2.5cm, bottom=2.5cm,
+  left=3cm,  right=2.5cm
+]{geometry}
+
+% ─── Colors ────────────────────────────────────────────────────────────────────
+\usepackage[dvipsnames, table]{xcolor}
+\definecolor{primary}{HTML}{2563EB}
+\definecolor{codebg}{HTML}{F3F4F6}
+\definecolor{codefg}{HTML}{1F2937}
+\definecolor{gps}{HTML}{166534}
+\definecolor{network}{HTML}{1E3A8A}
+\definecolor{ipcolor}{HTML}{78350F}
+
+% ─── Code Listings ─────────────────────────────────────────────────────────────
+\usepackage{listings}
+\lstdefinelanguage{TypeScript}{
+  keywords={
+    import, export, from, const, let, var, function, async, await,
+    return, if, else, try, catch, throw, new, typeof, null, true, false,
+    type, interface, enum, extends, implements, class, void
+  },
+  keywordstyle=\color{primary}\bfseries,
+  ndkeywords={string, number, boolean, Record, Promise},
+  ndkeywordstyle=\color{MidnightBlue},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{ForestGreen},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]`
+}
+\lstset{
+  language=TypeScript,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small\color{codefg},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=8pt,
+  stepnumber=1,
+  breaklines=true,
+  breakatwhitespace=true,
+  frame=single,
+  framerule=0.4pt,
+  rulecolor=\color{gray!40},
+  xleftmargin=1.5em,
+  framexleftmargin=1.5em,
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+  aboveskip=1em,
+  belowskip=0.5em
+}
+
+% ─── Tables ────────────────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% ─── Diagrams & Graphics ───────────────────────────────────────────────────────
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
+\usepackage{graphicx}
+
+% ─── Hyperlinks ────────────────────────────────────────────────────────────────
+\usepackage[
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=primary,
+  citecolor=primary
+]{hyperref}
+
+% ─── Miscellaneous ─────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% ─── Custom Boxes ──────────────────────────────────────────────────────────────
+\newtcolorbox{notebox}{
+  enhanced, breakable,
+  colback=blue!5, colframe=primary,
+  arc=4pt, boxrule=0.6pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, title={Nota}
+}
+\newtcolorbox{warningbox}{
+  enhanced, breakable,
+  colback=orange!8, colframe=orange!70!black,
+  arc=4pt, boxrule=0.6pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, title={Attenzione}
+}
+
+% ─── Header / Footer ───────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{GameInApp — Documentazione Tecnica}}
+\fancyhead[R]{\small\textit{Geolocalizzazione}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+  {\huge\bfseries GameInApp\par}
+  \vspace{0.5cm}
+  {\Large Documentazione Tecnica\par}
+  \vspace{1.5cm}
+  \rule{\linewidth}{0.5pt}\\[0.4cm]
+  {\LARGE\bfseries\color{primary} Sistema di Geolocalizzazione\par}
+  \rule{\linewidth}{0.5pt}
+  \vspace{2cm}
+  {\large Piera Di Fusco\par}
+  \vspace{0.5cm}
+  {\normalsize Tesi di Laurea — Ingegneria Informatica\par}
+  \vfill
+  {\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Introduzione}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+Il sistema di geolocalizzazione di \textbf{GameInApp} è una delle funzionalità
+core dell'applicazione: determina la posizione geografica dell'utente per
+restituire eventi sportivi e palestre nelle immediate vicinanze.
+
+La progettazione di questa funzionalità ha richiesto particolare attenzione
+alla \textbf{robustezza} e alla \textbf{degradazione controllata}: il sistema
+deve funzionare correttamente in una grande varietà di scenari, tra cui
+dispositivi mobili con GPS hardware, computer desktop privi di sensore di
+posizione, browser con autorizzazioni negate dall'utente, e ambienti di rete
+con connettività limitata.
+
+\subsection{Obiettivi di progettazione}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Massima copertura}: la posizione deve essere determinabile
+    in qualsiasi scenario ragionevole, con fallback graduali.
+  \item \textbf{Trasparenza all'utente}: il sistema comunica sempre il livello
+    di precisione ottenuto tramite un indicatore visivo.
+  \item \textbf{Manutenibilità}: la logica di geolocalizzazione è incapsulata
+    in un custom React Hook riutilizzabile, separata dalla logica di
+    presentazione.
+  \item \textbf{Sicurezza}: le dipendenze da servizi terzi sono esposte solo
+    lato server, mai nel bundle client.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Architettura del sistema}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Panoramica dei componenti}
+
+Il sistema si compone di tre elementi principali, ciascuno con una
+responsabilità ben definita:
+
+\begin{table}[h!]
+  \centering
+  \caption{Componenti del sistema di geolocalizzazione}
+  \begin{tabularx}{\linewidth}{L{4.5cm} C{2.5cm} L{6.5cm}}
+    \toprule
+    \textbf{File} & \textbf{Tipo} & \textbf{Responsabilità} \\
+    \midrule
+    \texttt{lib/hooks/useGeolocation.ts} & React Hook & Logica client-side, strategia a livelli, gestione stato \\
+    \addlinespace
+    \texttt{app/api/geo/route.ts} & API Route & Proxy server-side per IP geolocation \\
+    \addlinespace
+    \texttt{app/page.tsx} & Componente & Consumo del hook, badge indicatore source \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Strategia a tre livelli}
+
+Il sistema adotta una strategia a cascata (\textit{cascade fallback}) con tre
+livelli di precisione decrescente. Se un livello fallisce, si passa
+automaticamente al successivo senza alcun intervento dell'utente.
+
+\vspace{0.8em}
+\begin{center}
+\begin{tikzpicture}[
+  node distance=0.6cm and 0cm,
+  box/.style={
+    rectangle, rounded corners=4pt,
+    text width=7cm, align=center,
+    minimum height=1cm, font=\small,
+    draw, thick
+  },
+  arrow/.style={-{Stealth[length=6pt]}, thick, gray},
+  label/.style={font=\footnotesize\itshape, text=gray}
+]
+
+\node[box, fill=green!12, draw=green!60!black]     (l1)
+  {\textbf{Livello 1 — GPS ad alta precisione}\\
+   \small\texttt{enableHighAccuracy: true} — timeout 8\,s};
+
+\node[box, fill=blue!10, draw=blue!50!black,
+      below=1.4cm of l1]                            (l2)
+  {\textbf{Livello 2 — Geolocalizzazione di rete}\\
+   \small\texttt{enableHighAccuracy: false} — timeout 8\,s};
+
+\node[box, fill=orange!10, draw=orange!60!black,
+      below=1.4cm of l2]                            (l3)
+  {\textbf{Livello 3 — IP Geolocation (server-side)}\\
+   \small\texttt{/api/geo} → ip-api.com / ipapi.co};
+
+\node[box, fill=red!10, draw=red!50!black,
+      below=1.4cm of l3]                            (err)
+  {\textbf{Errore definitivo}\\
+   \small Messaggio localizzato + bottone \textit{Riprova}};
+
+\draw[arrow] (l1) -- node[right=4pt, label]
+  {code 2 (UNAVAILABLE) o code 3 (TIMEOUT)} (l2);
+\draw[arrow] (l2) -- node[right=4pt, label]
+  {qualsiasi errore} (l3);
+\draw[arrow] (l3) -- node[right=4pt, label]
+  {entrambi i provider falliscono} (err);
+
+\end{tikzpicture}
+\end{center}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Custom Hook: \texttt{useGeolocation}}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Interfaccia pubblica}
+
+Il hook espone la seguente interfaccia TypeScript:
+
+\begin{lstlisting}[caption={Tipo di ritorno del hook \texttt{useGeolocation}}]
+type GeoCoords = { lat: number; lng: number };
+type GeoSource = "gps" | "network" | "ip" | null;
+
+function useGeolocation(): {
+  coords:  GeoCoords | null; // coordinate o null se non ancora note
+  source:  GeoSource;        // sorgente della posizione
+  loading: boolean;          // true durante il processo di rilevamento
+  error:   string | null;    // messaggio d'errore in italiano
+  retry:   () => void;       // riavvia il processo senza ricaricare la pagina
+}
+\end{lstlisting}
+
+\subsection{Significato di \texttt{source}}
+
+Il campo \texttt{source} comunica all'utente la precisione della posizione
+rilevata, permettendo di mostrare un indicatore visivo appropriato:
+
+\begin{table}[h!]
+  \centering
+  \caption{Valori del campo \texttt{source} e precisione associata}
+  \begin{tabularx}{\linewidth}{C{2cm} L{5cm} L{5.5cm}}
+    \toprule
+    \textbf{Valore} & \textbf{Sorgente} & \textbf{Precisione tipica} \\
+    \midrule
+    \texttt{"gps"}     & GPS hardware o WiFi Positioning ad alta accuratezza & $< 10$\,m \\
+    \addlinespace
+    \texttt{"network"} & Geolocalizzazione browser a bassa accuratezza (WiFi/IP lato browser) & $100$\,m -- $5$\,km \\
+    \addlinespace
+    \texttt{"ip"}      & Risoluzione tramite indirizzo IP pubblico & Livello città ($\sim 10$\,km) \\
+    \addlinespace
+    \texttt{null}      & Posizione non ancora determinata (\textit{loading}) & — \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Gestione degli errori W3C}
+
+La Geolocation API del browser definisce tre codici di errore standardizzati
+\cite{w3c-geolocation}. Il sistema li gestisce in modo differenziato:
+
+\begin{table}[h!]
+  \centering
+  \caption{Gestione dei codici errore della Geolocation API W3C}
+  \begin{tabularx}{\linewidth}{C{1.2cm} L{3.8cm} L{7.5cm}}
+    \toprule
+    \textbf{Code} & \textbf{Costante} & \textbf{Comportamento} \\
+    \midrule
+    \texttt{1} & \texttt{PERMISSION\_DENIED}      & Errore immediato, nessun retry. L'utente ha esplicitamente negato l'accesso alla posizione. \\
+    \addlinespace
+    \texttt{2} & \texttt{POSITION\_UNAVAILABLE}   & Retry a bassa accuratezza (Livello 2) → fallback IP (Livello 3). \\
+    \addlinespace
+    \texttt{3} & \texttt{TIMEOUT}                 & Retry a bassa accuratezza (Livello 2) → fallback IP (Livello 3). \\
+    \addlinespace
+    —          & API non disponibile              & Salta direttamente al fallback IP (Livello 3). \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{notebox}
+Il codice \texttt{1 (PERMISSION\_DENIED)} non viene mai ritentato
+automaticamente: una volta che l'utente ha negato il permesso, ritentare
+sarebbe inutile e potenzialmente fastidioso. Viene invece mostrato un bottone
+\textit{Riprova} che l'utente può premere \emph{dopo} aver modificato le
+impostazioni del browser.
+\end{notebox}
+
+\subsection{Implementazione}
+
+\subsubsection{Cancellazione e prevenzione dei memory leak}
+
+Un problema comune con i custom hook asincroni in React è l'aggiornamento di
+stato su componenti già smontati, che provoca warning e potenziali memory
+leak. Il hook usa il pattern \texttt{cancelled flag} per prevenirlo:
+
+\begin{lstlisting}[caption={Pattern cancelled flag per cleanup asincrono}]
+useEffect(() => {
+  let cancelled = false;
+
+  const succeed = (lat: number, lng: number, src: GeoSource) => {
+    if (cancelled) return; // no setState su componente smontato
+    setCoords({ lat, lng });
+    setSource(src);
+    setLoading(false);
+  };
+
+  // ... logica geolocalizzazione ...
+
+  return () => {
+    cancelled = true; // cleanup: le callback ignoreranno i risultati
+  };
+}, [attempt]);
+\end{lstlisting}
+
+\subsubsection{Meccanismo di retry}
+
+La funzione \texttt{retry()} sfrutta il pattern idiomatico React di
+incrementare un contatore come dipendenza del \texttt{useEffect}, evitando
+la necessità di logica imperativa:
+
+\begin{lstlisting}[caption={Implementazione del retry tramite contatore}]
+const [attempt, setAttempt] = useState(0);
+
+const retry = useCallback(() => {
+  setCoords(null);
+  setSource(null);
+  setError(null);
+  setLoading(true);
+  setAttempt((n) => n + 1); // incremento -> re-run del useEffect
+}, []);
+
+useEffect(() => {
+  // ... tutto il processo di geolocalizzazione ...
+}, [attempt]); // re-eseguito ad ogni chiamata di retry()
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{API Route: \texttt{GET /api/geo}}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Motivazione del proxy server-side}
+
+La geolocalizzazione tramite IP potrebbe sembrare una funzionalità da
+implementare direttamente nel browser (chiamata client-side al provider).
+Tuttavia, l'adozione di un proxy server-side offre vantaggi significativi:
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Nessun problema di CORS}: le chiamate avvengono
+    server $\rightarrow$ provider, non browser $\rightarrow$ provider.
+  \item \textbf{Nessuna dipendenza nel bundle client}: il provider può essere
+    cambiato senza modificare o ridistribuire il codice frontend.
+  \item \textbf{Caching server-side}: la risposta viene cachata per 5 minuti
+    (\texttt{Cache-Control} e \texttt{next: \{ revalidate: 300 \}}), riducendo
+    le chiamate al provider.
+  \item \textbf{Sicurezza}: un'eventuale API key futura non sarà mai esposta
+    nel codice client.
+\end{enumerate}
+
+\subsection{Catena di provider}
+
+L'API route implementa una catena di provider con failover automatico:
+
+\begin{lstlisting}[caption={Catena di provider in \texttt{/api/geo}}]
+// Provider 1: ip-api.com
+// - Gratuito, 1000 req/min, nessuna API key
+// - Fallisce con IP privati (es. 127.0.0.1 in sviluppo locale)
+const ipApiRes = await fetch(
+  `http://ip-api.com/json/${useIp}?fields=status,lat,lon,city,country`
+);
+
+// Provider 2: ipapi.co (fallback)
+// - Gratuito (~1000 req/giorno), funziona anche da localhost
+const ipapiRes = await fetch("https://ipapi.co/json/");
+\end{lstlisting}
+
+\subsection{Gestione degli indirizzi IP privati}
+
+In ambiente di sviluppo locale, l'header \texttt{X-Forwarded-For} non è
+presente (nessun reverse proxy davanti a Next.js), quindi il server riceve
+l'IP di loopback \texttt{127.0.0.1} o \texttt{::1}. Questi indirizzi
+appartengono a range privati RFC 1918 \cite{rfc1918} che i provider di
+geolocalizzazione non sono in grado di risolvere.
+
+La funzione \texttt{isPrivateIp()} rileva questi casi:
+
+\begin{lstlisting}[caption={Rilevamento di indirizzi IP privati}]
+function isPrivateIp(ip: string): boolean {
+  return (
+    ip === "127.0.0.1" || ip === "::1" || ip === "localhost" ||
+    /^10\./.test(ip) ||                   // RFC 1918 Class A
+    /^172\.(1[6-9]|2\d|3[01])\./.test(ip) || // RFC 1918 Class B
+    /^192\.168\./.test(ip) ||             // RFC 1918 Class C
+    /^::ffff:127\./.test(ip)              // IPv4-mapped loopback
+  );
+}
+\end{lstlisting}
+
+\subsection{Formato della risposta}
+
+In caso di successo, l'endpoint restituisce:
+
+\begin{lstlisting}[language={},caption={Risposta JSON di \texttt{GET /api/geo}}]
+{
+  "lat":      41.9028,
+  "lng":      12.4964,
+  "city":     "Roma",
+  "country":  "Italy",
+  "accuracy": "city"
+}
+\end{lstlisting}
+
+Il campo \texttt{accuracy} indica esplicitamente che si tratta di una
+posizione a livello di città, permettendo all'interfaccia di mostrare il
+badge \textit{IP (approx.)} appropriato.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Integrazione nell'interfaccia utente}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Consumo del hook}
+
+In \texttt{app/page.tsx}, tutta la logica di geolocalizzazione è ridotta a
+una singola riga di destructuring:
+
+\begin{lstlisting}[caption={Consumo del hook nella pagina principale}]
+const {
+  coords,            // { lat, lng } passato a /api/events/search e alla mappa
+  source: geoSource, // "gps" | "network" | "ip" | null
+  loading: geoLoading,
+  error: geoError,
+  retry: retryGeo,   // collegato al bottone "Riprova"
+} = useGeolocation();
+
+// Lo stato di loading e error viene composto con quelli del fetch eventi
+const loading = geoLoading || fetchLoading;
+const error   = geoError ?? fetchError;
+\end{lstlisting}
+
+\subsection{Indicatore visivo della sorgente}
+
+Per massima trasparenza verso l'utente, viene mostrato un badge colorato che
+indica la qualità della posizione rilevata:
+
+\begin{table}[h!]
+  \centering
+  \caption{Badge visivi per la sorgente di posizione}
+  \begin{tabularx}{\linewidth}{C{2cm} C{2.5cm} C{2.5cm} L{5cm}}
+    \toprule
+    \textbf{Source} & \textbf{Label} & \textbf{Colore} & \textbf{Messaggio implicito} \\
+    \midrule
+    \texttt{"gps"}     & GPS           & Verde  & Posizione precisa \\
+    \texttt{"network"} & Rete          & Blu    & Posizione approssimativa \\
+    \texttt{"ip"}      & IP (approx.)  & Ambra  & Solo città — possibile imprecisione \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Limitazioni e considerazioni}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Precisione della geolocalizzazione IP}
+
+La geolocalizzazione tramite IP è intrinsecamente limitata nella precisione.
+I provider mappano gli indirizzi IP a blocchi assegnati dagli ISP, che
+possono corrispondere a regioni geografiche anche molto ampie. In ambiente
+urbano la precisione è solitamente a livello di città (qualche chilometro),
+ma in aree rurali o con ISP regionali può essere molto peggiore.
+
+\begin{warningbox}
+L'utente che utilizza una VPN vedrà una posizione corrispondente al nodo VPN,
+non alla sua posizione reale. Il badge \textit{IP (approx.)} aiuta a
+comunicare questa incertezza.
+\end{warningbox}
+
+\subsection{Privacy e GDPR}
+
+La posizione geografica è un dato personale ai sensi del
+Regolamento~(UE)~2016/679 (GDPR)~\cite{gdpr}. Il sistema:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Richiede il consenso esplicito dell'utente tramite il popup nativo del
+    browser (livelli 1 e 2);
+  \item Non persiste le coordinate in nessun database;
+  \item Usa le coordinate esclusivamente per la query di ricerca eventi
+    (\texttt{/api/events/search});
+  \item Nel caso del fallback IP, non trasmette l'IP al client — il proxy
+    server-side effettua la chiamata al provider esterno.
+\end{itemize}
+
+\subsection{Rate limiting dei provider}
+
+\begin{table}[h!]
+  \centering
+  \caption{Limiti dei provider di geolocalizzazione IP utilizzati}
+  \begin{tabularx}{\linewidth}{L{3cm} L{3.5cm} L{3.5cm} L{3cm}}
+    \toprule
+    \textbf{Provider} & \textbf{Limite} & \textbf{API Key} & \textbf{Uso} \\
+    \midrule
+    ip-api.com & 1\,000 req/min & Non richiesta & Primario \\
+    ipapi.co   & $\sim$1\,000 req/giorno & Non richiesta & Fallback \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Per un'applicazione in produzione con traffico elevato, si raccomanda di
+valutare provider con piani commerciali (es. MaxMind GeoIP2, ipinfo.io) da
+integrare come unica sostituzione in \texttt{app/api/geo/route.ts}.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section*{Riferimenti}
+% ═══════════════════════════════════════════════════════════════════════════════
+\addcontentsline{toc}{section}{Riferimenti}
+\begin{thebibliography}{9}
+
+\bibitem{w3c-geolocation}
+  W3C Geolocation API Specification, \textit{Geolocation API},
+  \url{https://www.w3.org/TR/geolocation/}, 2022.
+
+\bibitem{rfc1918}
+  Y. Rekhter, B. Moskowitz, D. Karrenberg, G. J. de Groot, E. Lear,
+  \textit{Address Allocation for Private Internets}, RFC 1918,
+  Internet Engineering Task Force, 1996.
+
+\bibitem{gdpr}
+  Parlamento Europeo e Consiglio dell'Unione Europea,
+  \textit{Regolamento (UE) 2016/679 — GDPR},
+  Gazzetta Ufficiale dell'Unione Europea, 2016.
+
+\bibitem{react-hooks}
+  Meta Open Source, \textit{React Hooks Reference},
+  \url{https://react.dev/reference/react}, 2024.
+
+\bibitem{nextjs-route-handlers}
+  Vercel Inc., \textit{Next.js Route Handlers},
+  \url{https://nextjs.org/docs/app/building-your-application/routing/route-handlers}, 2024.
+
+\end{thebibliography}
+
+\end{document}

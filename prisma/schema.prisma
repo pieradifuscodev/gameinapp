@@ -52,6 +52,10 @@ model Event {
   status       String   
   isPrivate    Boolean  @default(false)
   
+  price            Float?
+  skillLevel       String?
+  genderPreference String?
+
   creatorId    String
   creator      User     @relation("EventCreator", fields: [creatorId], references: [id])
   

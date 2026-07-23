@@ -1,7 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Calendar, MapPin, Users, Info } from "lucide-react";
-import Link from "next/link";
+import { getSportDetails } from "@/lib/sports";
+import EventClientActions from "@/components/events/EventClientActions";
+import { EventHero } from "@/components/events/details/EventHero";
+import { EventBadges } from "@/components/events/details/EventBadges";
+import { EventInfoCards } from "@/components/events/details/EventInfoCards";
+import { EventOrganizer } from "@/components/events/details/EventOrganizer";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -21,117 +26,61 @@ export default async function EventDetailPage({ params }: { params: { id: string
 
   const spotsLeft = event.maxPlayers - event.participants.length;
   const isFull = spotsLeft <= 0;
+  const sport = getSportDetails(event.sport);
 
   return (
-    <div className="flex flex-col h-full pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white shadow-sm px-4 py-4 flex items-center gap-3">
-        <Link href="/" className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
-          <ChevronLeft size={24} className="text-gray-800" />
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900 truncate">Dettagli Evento</h1>
-      </header>
+    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+      
+      {/* ── TOP HEADER ── */}
+      <EventHero imageUrl={`/images/sports/${sport.imageId}.png`} sportLabel={sport.label} />
 
-      {/* Hero Section */}
-      <div className="bg-white px-4 py-6 mb-2 border-b border-gray-100">
-        <div className="flex justify-between items-start mb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-md">
-            {event.sport}
-          </span>
-          <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${
-            event.status === 'OPEN' ? 'text-primary bg-primary/20' : 'text-gray-500 bg-gray-100'
-          }`}>
-            {event.status}
-          </span>
+      {/* ── SCROLLABLE CONTENT ── */}
+      <div className="flex-1 overflow-y-auto pb-24 pt-4">
+        {/* ── TITLE & BADGES ── */}
+        <EventBadges 
+          status={event.status} 
+          title={event.title} 
+          price={event.price} 
+          skillLevel={event.skillLevel} 
+          genderPreference={event.genderPreference} 
+          imageUrl={`/images/sports/${sport.imageId}.png`}
+          sportLabel={sport.label}
+        />
+
+      {/* ── DESCRIZIONE ── */}
+      {event.description && (
+        <div className="px-5 mb-5">
+          <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Descrizione</h3>
+          <p className="text-slate-900 text-[14px] leading-relaxed">{event.description}</p>
         </div>
-        
-        <h2 className="text-2xl font-black text-gray-900 leading-tight mb-2">{event.title}</h2>
-        <p className="text-gray-600 text-sm leading-relaxed">{event.description}</p>
-      </div>
+      )}
 
-      {/* Info Cards */}
-      <div className="px-4 py-4 flex flex-col gap-3">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-start gap-4">
-          <div className="bg-primary/10 p-3 rounded-full text-primary">
-            <Calendar size={20} />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-semibold mb-0.5">DATA E ORA</p>
-            <p className="text-sm font-medium text-gray-900">
-              {new Date(event.dateStart).toLocaleString('it-IT', { 
-                weekday: 'long', 
-                day: '2-digit', 
-                month: 'long', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </p>
-          </div>
-        </div>
+      {/* ── INFO CARDS ── */}
+      <EventInfoCards 
+        dateStart={event.dateStart}
+        gymName={event.gym?.name || null}
+        location={event.location}
+        gymAddress={event.gym?.address || null}
+        participantsCount={event.participants.length}
+        maxPlayers={event.maxPlayers}
+        spotsLeft={spotsLeft}
+        isFull={isFull}
+      />
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-start gap-4">
-          <div className="bg-primary/10 p-3 rounded-full text-primary">
-            <MapPin size={20} />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-semibold mb-0.5">STRUTTURA / LUOGO</p>
-            <p className="text-sm font-medium text-gray-900 mb-0.5">{event.gym?.name || event.location}</p>
-            <p className="text-xs text-gray-500">{event.gym?.address || ""}</p>
-          </div>
-        </div>
+      {/* ── ORGANIZZATORE ── */}
+      <EventOrganizer 
+        name={event.creator.name}
+        surname={event.creator.surname}
+        role={event.creator.role}
+      />
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-start gap-4">
-          <div className="bg-primary/10 p-3 rounded-full text-primary">
-            <Users size={20} />
-          </div>
-          <div className="w-full">
-            <p className="text-xs text-gray-500 font-semibold mb-0.5">PARTECIPANTI</p>
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-sm font-medium text-gray-900">
-                {event.participants.length} su {event.maxPlayers} posti
-              </p>
-              <span className={`text-xs font-bold ${spotsLeft <= 2 ? 'text-red-500' : 'text-primary'}`}>
-                {isFull ? 'Completo' : `${spotsLeft} posti rimasti`}
-              </span>
-            </div>
-            {/* Progress Bar */}
-            <div className="w-full bg-gray-100 rounded-full h-2 mt-2">
-              <div 
-                className={`h-2 rounded-full ${isFull ? 'bg-red-500' : 'bg-primary/80'}`} 
-                style={{ width: `${Math.min((event.participants.length / event.maxPlayers) * 100, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 py-2 mt-2">
-        <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-          <Info size={16} /> Organizzatore
-        </h3>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3">
-           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold">
-            {event.creator.name?.[0] || "U"}
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 text-sm">{event.creator.name || "Utente"} {event.creator.surname || ""}</p>
-            <p className="text-xs text-gray-500">Organizzatore evento</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Fixed Bottom Action */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 pb-safe">
-        <button 
-          disabled={isFull}
-          className={`w-full py-3.5 rounded-xl text-sm font-bold shadow-sm transition-transform active:scale-[0.98] ${
-            isFull 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-              : 'bg-primary text-white hover:bg-primary'
-          }`}
-        >
-          {isFull ? 'Evento Completo' : 'Iscriviti e Paga (Stripe)'}
-        </button>
+      {/* ── CLIENT ACTIONS (Pagamento/Iscrizione) ── */}
+      <EventClientActions 
+        eventId={event.id}
+        price={event.price}
+        spotsLeft={spotsLeft}
+        isFull={isFull}
+      />
       </div>
     </div>
   );

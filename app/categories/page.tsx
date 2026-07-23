@@ -15,22 +15,22 @@ const WaveSVG = ({ className }: { className?: string }) => (
 export default function CategoriesPage() {
   return (
     <div className="flex flex-col h-full bg-white relative pb-safe">
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-4 py-4 flex flex-col gap-4">
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md px-4 py-3 flex flex-col gap-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
-            <ChevronLeft size={24} className="text-gray-800" />
+          <Link href="/dashboard" className="w-8 h-8 flex items-center justify-center -ml-2 rounded-full active:bg-slate-100 transition-colors">
+            <ChevronLeft size={24} className="text-slate-900" />
           </Link>
-          <h1 className="text-lg font-black text-gray-900">Categorie</h1>
-          <div className="w-10"></div>
+          <h1 className="text-base font-bold text-slate-900">Categorie</h1>
+          <div className="w-8"></div>
         </div>
 
         {/* Barra di ricerca opzionale per le categorie */}
-        <div className="relative">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="relative pb-1">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             type="text" 
             placeholder="Cerca uno sport..." 
-            className="w-full bg-gray-100 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-primary/80 outline-none"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-[14px] text-slate-900 font-medium focus:ring-1 focus:ring-slate-300 outline-none placeholder:text-slate-400"
           />
         </div>
       </header>
@@ -39,7 +39,7 @@ export default function CategoriesPage() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {SPORTS.map((cat, i) => (
             <Link 
-              href={`/dashboard/search?sport=${cat.id}`} 
+              href={`/categories/${cat.id}`} 
               key={cat.id}
               className={`relative overflow-hidden rounded-2xl aspect-[1.3] shadow-sm transition-transform active:scale-95 ${cat.color}`}
             >

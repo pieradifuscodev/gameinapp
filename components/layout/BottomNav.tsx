@@ -26,8 +26,8 @@ export default function BottomNav() {
     }
   }, [session, pathname]);
 
-  // Hide on auth/onboarding pages
-  const isHidden = ["/login", "/register", "/onboarding", "/events/new"].some(p => pathname?.startsWith(p));
+  // Hide on auth/onboarding pages and event detail/creation pages
+  const isHidden = ["/login", "/register", "/onboarding", "/events/"].some(p => pathname?.startsWith(p));
 
   if (isHidden) return null;
 
@@ -36,47 +36,36 @@ export default function BottomNav() {
     return (
       <Link 
         href={href}
-        className={`flex flex-col items-center justify-center w-14 h-full transition-all active:scale-95 ${
-          isActive ? "text-blue-600" : "text-gray-400 hover:text-gray-600"
+        className={`flex flex-col items-center justify-center w-12 h-12 transition-colors active:scale-95 relative ${
+          isActive ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
         }`}
+        aria-label={label}
       >
-        <div className={`relative p-1 rounded-xl transition-colors ${isActive ? "bg-blue-50" : ""}`}>
-          <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-          {href === '/notifications' && unreadCount > 0 && (
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          )}
-        </div>
-        <span className={`text-[10px] mt-0.5 tracking-wide ${isActive ? "font-bold" : "font-medium"}`}>
-          {label}
-        </span>
+        <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+        {href === '/notifications' && unreadCount > 0 && (
+          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+        )}
       </Link>
     );
   };
 
   return (
-    <nav className="pb-safe bg-white border-t border-gray-100 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] shrink-0 z-50 relative">
-      <div className="flex justify-between items-center px-4 py-1.5 h-16 relative">
-        {/* Left items */}
-        <div className="flex gap-4">
-          <NavItem href="/" icon={Home} label="Home" />
-          <NavItem href="/categories" icon={LayoutGrid} label="Categorie" />
-        </div>
+    <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-200 z-50 pb-safe">
+      <div className="flex justify-around items-center px-4 py-2 max-w-md mx-auto w-full">
+        <NavItem href="/" icon={Home} label="Home" />
+        <NavItem href="/categories" icon={LayoutGrid} label="Categorie" />
+        
+        {/* Central Plus Button - Styled as a clean outlined icon or filled circle */}
+        <Link 
+          href="/events/new"
+          className="flex items-center justify-center w-10 h-10 border-2 border-slate-900 text-slate-900 rounded-xl active:bg-slate-50 transition-colors mx-1"
+          aria-label="Crea Evento"
+        >
+          <Plus size={22} strokeWidth={2.5} />
+        </Link>
 
-        {/* Center Floating Action Button */}
-        <div className="absolute left-1/2 -top-6 -translate-x-1/2">
-          <Link 
-            href="/events/new"
-            className="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-200 active:scale-90 transition-transform border-4 border-white"
-          >
-            <Plus size={28} strokeWidth={2.5} />
-          </Link>
-        </div>
-
-        {/* Right items */}
-        <div className="flex gap-4">
-          <NavItem href="/notifications" icon={Bell} label="Notifiche" />
-          <NavItem href="/dashboard" icon={User} label="Profilo" />
-        </div>
+        <NavItem href="/notifications" icon={Bell} label="Notifiche" />
+        <NavItem href="/dashboard" icon={User} label="Profilo" />
       </div>
     </nav>
   );

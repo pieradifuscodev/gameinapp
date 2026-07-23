@@ -62,11 +62,14 @@ export async function GET(req: Request) {
         d."maxPlayers",
         d.status,
         d."isPrivate",
+        d.price,
+        d."skillLevel",
+        d."genderPreference",
         d."distanceInKm",
-        json_build_object('id', g.id, 'name', g.name, 'address', g.address) AS gym,
+        json_build_object('id', COALESCE(g.id, ''), 'name', COALESCE(g.name, d.location), 'address', COALESCE(g.address, d.location)) AS gym,
         json_build_object('id', u.id, 'name', u.name, 'surname', u.surname, 'email', u.email, 'role', u.role) AS creator
       FROM calculated_distances d
-      JOIN "Gym" g ON d."gymId" = g.id
+      LEFT JOIN "Gym" g ON d."gymId" = g.id
       JOIN "User" u ON d."creatorId" = u.id
       WHERE d."distanceInKm" <= ${radius}
       ORDER BY d."distanceInKm" ASC;
