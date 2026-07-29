@@ -9,6 +9,8 @@ export async function GET(req: Request) {
     const lngParam = searchParams.get('lng');
     const radiusParam = searchParams.get('radius');
     const sportParam = searchParams.get('sport');
+    const dateParam = searchParams.get('date');
+    const timeParam = searchParams.get('time');
 
     // 1. Estrazione e Validazione
     if (!latParam || !lngParam) {
@@ -29,10 +31,40 @@ export async function GET(req: Request) {
       );
     }
 
-    // 2. Filtro condizionale per sport
-    const sportFilter = sportParam 
+    // 2. Filtro condizionale per sport, data e ora
+    const sportFilter = sportParam && sportParam !== 'null'
       ? Prisma.sql`AND e.sport = ${sportParam}` 
       : Prisma.empty;
+      
+    let startDate = new Date();
+    let endDate: Date | null = null;
+    
+    if (dateParam === 'TODAY') {
+      endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
+    } else if (dateParam === 'TOMORROW') {
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() + 1);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(startDate);
+      endDate.setHours(23, 59, 59, 999);
+    } else if (dateParam === 'WEEK') {
+      endDate = new Date();
+      endDate.setDate(endDate.getDate() + 7);
+    }
+    
+    const dateFilter = endDate 
+      ? Prisma.sql`AND e."dateStart" >= ${startDate} AND e."dateStart" <= ${endDate}`
+      : Prisma.sql`AND e."dateStart" >= ${startDate}`;
+
+    let timeFilter = Prisma.empty;
+    if (timeParam === 'MORNING') {
+      timeFilter = Prisma.sql`AND EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') >= 6 AND EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') < 13`;
+    } else if (timeParam === 'AFTERNOON') {
+      timeFilter = Prisma.sql`AND EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') >= 13 AND EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') < 19`;
+    } else if (timeParam === 'EVENING') {
+      timeFilter = Prisma.sql`AND (EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') >= 19 OR EXTRACT(HOUR FROM e."dateStart" AT TIME ZONE 'Europe/Rome') < 6)`;
+    }
 
     // 3. Calcolo Geospaziale con Haversine e filtri aggiuntivi tramite $queryRaw
     // Usiamo una CTE (Common Table Expression) per calcolare la distanza e poi filtrare su di essa
@@ -49,6 +81,8 @@ export async function GET(req: Request) {
         WHERE e.status = 'OPEN' 
           AND e."isPrivate" = false
           ${sportFilter}
+          ${dateFilter}
+          ${timeFilter}
       )
       SELECT 
         d.id,

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +59,12 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-slate-700 font-bold">Password</Label>
+          <div className="flex justify-between items-center mb-1.5">
+            <Label className="text-slate-700 font-bold">Password</Label>
+            <Link href="/forgot-password" className="text-[12px] font-bold text-primary hover:underline">
+              Password dimenticata?
+            </Link>
+          </div>
           <Input
             type="password"
             required

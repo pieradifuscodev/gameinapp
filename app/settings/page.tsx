@@ -46,7 +46,7 @@ export default function SettingsIndexPage() {
         <div className="flex flex-col items-center mb-8">
           <div className="w-20 h-20 rounded-full bg-slate-50 border border-slate-200 mb-3 overflow-hidden flex items-center justify-center shadow-sm p-0.5">
             {u.avatar ? (
-              <Image src={u.avatar} alt="Avatar" width={80} height={80} className="w-full h-full object-cover rounded-full" />
+              <img src={u.avatar} alt="Avatar" className="w-20 h-20 object-cover rounded-full shadow-sm" />
             ) : (
               <span className="text-2xl font-semibold text-slate-700">{getInitials()}</span>
             )}

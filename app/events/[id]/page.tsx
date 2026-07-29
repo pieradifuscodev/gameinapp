@@ -7,9 +7,13 @@ import { EventBadges } from "@/components/events/details/EventBadges";
 import { EventInfoCards } from "@/components/events/details/EventInfoCards";
 import { EventOrganizer } from "@/components/events/details/EventOrganizer";
 import { Card, CardContent } from "@/components/ui/card";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export default async function EventDetailPage({ params }: { params: { id: string } }) {
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await getServerSession(authOptions);
+  const currentUserId = session?.user ? (session.user as any).id : null;
 
   const event = await prisma.event.findUnique({
     where: { id },
@@ -24,6 +28,8 @@ export default async function EventDetailPage({ params }: { params: { id: string
     return notFound();
   }
 
+  const isCreator = currentUserId === event.creatorId;
+  const isParticipating = event.participants.some(p => p.id === currentUserId);
   const spotsLeft = event.maxPlayers - event.participants.length;
   const isFull = spotsLeft <= 0;
   const sport = getSportDetails(event.sport);
@@ -67,19 +73,22 @@ export default async function EventDetailPage({ params }: { params: { id: string
         isFull={isFull}
       />
 
-      {/* ── ORGANIZZATORE ── */}
+      {/* ── STRUTTURA ── */}
       <EventOrganizer 
+        id={event.creator.id}
         name={event.creator.name}
         surname={event.creator.surname}
         role={event.creator.role}
       />
 
-      {/* ── CLIENT ACTIONS (Pagamento/Iscrizione) ── */}
+      {/* ── CLIENT ACTIONS (Pagamento/Iscrizione/Modifica) ── */}
       <EventClientActions 
         eventId={event.id}
         price={event.price}
         spotsLeft={spotsLeft}
         isFull={isFull}
+        isCreator={isCreator}
+        isParticipating={isParticipating}
       />
       </div>
     </div>

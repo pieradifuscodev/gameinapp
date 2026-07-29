@@ -10,6 +10,10 @@ interface FilterModalProps {
   setRadius: (r: number) => void;
   filterType: "ALL" | "PRIVATE" | "ORGANIZER";
   setFilterType: (type: "ALL" | "PRIVATE" | "ORGANIZER") => void;
+  dateFilter: "ALL" | "TODAY" | "TOMORROW" | "WEEK";
+  setDateFilter: (val: "ALL" | "TODAY" | "TOMORROW" | "WEEK") => void;
+  timeFilter: "ALL" | "MORNING" | "AFTERNOON" | "EVENING";
+  setTimeFilter: (val: "ALL" | "MORNING" | "AFTERNOON" | "EVENING") => void;
 }
 
 export default function FilterModal({
@@ -20,6 +24,10 @@ export default function FilterModal({
   setRadius,
   filterType,
   setFilterType,
+  dateFilter,
+  setDateFilter,
+  timeFilter,
+  setTimeFilter,
 }: FilterModalProps) {
   const [isSportDropdownOpen, setIsSportDropdownOpen] = useState(false);
 
@@ -99,6 +107,51 @@ export default function FilterModal({
             <div className="flex justify-between text-[11px] text-gray-400 font-bold mt-2">
               <span>1 km</span>
               <span>50 km</span>
+            </div>
+          </div>
+
+          {/* Date Filter */}
+          <div className="mb-8">
+            <label className="font-bold text-gray-700 mb-3 block text-sm">Quando vuoi giocare?</label>
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2 snap-x">
+              {[
+                { id: "ALL", label: "Tutti i giorni", icon: "📅" },
+                { id: "TODAY", label: "Oggi", icon: "🔥" },
+                { id: "TOMORROW", label: "Domani", icon: "🌅" },
+                { id: "WEEK", label: "Questa Settimana", icon: "🗓" }
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setDateFilter(opt.id as any)}
+                  className={`shrink-0 snap-start px-4 py-2.5 rounded-xl font-bold text-[13px] border-2 transition-all flex items-center gap-2 ${dateFilter === opt.id ? 'border-primary bg-primary/10 text-primary' : 'border-gray-100 bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  <span className="text-lg">{opt.icon}</span> {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Time Filter */}
+          <div className="mb-8">
+            <label className="font-bold text-gray-700 mb-3 block text-sm">Fascia oraria</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: "ALL", label: "Qualsiasi orario", icon: "🕒" },
+                { id: "MORNING", label: "Mattina", icon: "☕️", desc: "06:00 - 13:00" },
+                { id: "AFTERNOON", label: "Pomeriggio", icon: "☀️", desc: "13:00 - 19:00" },
+                { id: "EVENING", label: "Sera", icon: "🌙", desc: "19:00 - 06:00" }
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setTimeFilter(opt.id as any)}
+                  className={`p-3 rounded-xl border-2 font-bold text-[13px] transition-all flex flex-col items-start gap-1 ${timeFilter === opt.id ? 'border-primary bg-primary/10 text-primary' : 'border-gray-100 bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{opt.icon}</span> {opt.label}
+                  </div>
+                  {opt.desc && <span className={`text-[10px] ${timeFilter === opt.id ? 'text-primary/70' : 'text-gray-400'}`}>{opt.desc}</span>}
+                </button>
+              ))}
             </div>
           </div>
 

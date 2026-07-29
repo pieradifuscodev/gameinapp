@@ -3,6 +3,7 @@ import { getSportDetails } from "@/lib/sports";
 
 interface ProfileHeaderProps {
   user: {
+    id: string;
     name: string | null;
     surname: string | null;
     username: string | null;
@@ -54,14 +55,14 @@ export function ProfileHeader({ user, stats, favoriteSports }: ProfileHeaderProp
                 <span className="text-base font-bold text-slate-900">{stats.createdCount}</span>
                 <span className="text-[12px] text-slate-900">creati</span>
               </div>
-              <div className="flex flex-col items-center">
+              <Link href={`/profile/${user.id}/followers`} className="flex flex-col items-center active:opacity-70 transition-opacity">
                 <span className="text-base font-bold text-slate-900">{stats.followersCount}</span>
                 <span className="text-[12px] text-slate-900">follower</span>
-              </div>
-              <div className="flex flex-col items-center">
+              </Link>
+              <Link href={`/profile/${user.id}/following`} className="flex flex-col items-center active:opacity-70 transition-opacity">
                 <span className="text-base font-bold text-slate-900">{stats.followingCount}</span>
                 <span className="text-[12px] text-slate-900">seguiti</span>
-              </div>
+              </Link>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { createEventSchema, CreateEventInput } from "@/lib/validations/event";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Save, AlertCircle, Calendar, Banknote } from "lucide-react";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 import { SportSelector } from "@/components/events/forms/SportSelector";
 import { LocationSearch } from "@/components/events/forms/LocationSearch";
 import { PlayerCounter } from "@/components/events/forms/PlayerCounter";
@@ -30,18 +31,20 @@ interface EventFormProps {
   userRole: string;
   circles: Circle[];
   gyms: Gym[];
+  eventId?: string;
+  initialData?: any;
 }
 
-export default function EventForm({ userRole, circles, gyms }: EventFormProps) {
+export default function EventForm({ userRole, circles, gyms, eventId, initialData }: EventFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const isOrganizer = userRole === "ORGANIZZATORE";
+  const isOrganizer = userRole === "STRUTTURA";
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CreateEventInput>({
     resolver: zodResolver(createEventSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       title: "",
       sport: "",
       dateStart: "",
@@ -76,8 +79,11 @@ export default function EventForm({ userRole, circles, gyms }: EventFormProps) {
     }
     
     try {
-      const res = await fetch("/api/events", {
-        method: "POST",
+      const endpoint = eventId ? `/api/events/${eventId}` : "/api/events";
+      const method = eventId ? "PUT" : "POST";
+
+      const res = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
@@ -85,13 +91,20 @@ export default function EventForm({ userRole, circles, gyms }: EventFormProps) {
       const result = await res.json();
       
       if (!res.ok) {
-        throw new Error(result.error || "Errore durante la creazione dell'evento");
+        throw new Error(result.error || `Errore durante ${eventId ? "l'aggiornamento" : "la creazione"} dell'evento`);
       }
       
-      // Redirect alla pagina del nuovo evento o alla dashboard
-      router.push(`/dashboard`);
+      toast.success(eventId ? "Evento modificato con successo!" : "Evento creato con successo!");
+
+      // Redirect alla pagina dell'evento o dashboard
+      if (eventId) {
+        router.push(`/events/${eventId}`);
+      } else {
+        router.push(`/dashboard`);
+      }
       router.refresh();
     } catch (err: any) {
+      toast.error(err.message);
       setErrorMsg(err.message);
       setLoading(false);
     }
@@ -235,7 +248,7 @@ export default function EventForm({ userRole, circles, gyms }: EventFormProps) {
           {loading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
           ) : (
-            <><Save size={20} /> Crea Evento</>
+            <><Save size={20} /> {eventId ? "Salva Modifiche" : "Crea Evento"}</>
           )}
         </button>
       </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, Search } from "lucide-react";
+import { SportIllustration } from "@/components/ui/SportIllustration";
 
 import { SPORTS } from "@/lib/sports";
 
@@ -15,31 +16,15 @@ const WaveSVG = ({ className }: { className?: string }) => (
 export default function CategoriesPage() {
   return (
     <div className="flex flex-col h-full bg-white relative pb-safe">
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md px-4 py-3 flex flex-col gap-3 border-b border-slate-100">
-        <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="w-8 h-8 flex items-center justify-center -ml-2 rounded-full active:bg-slate-100 transition-colors">
-            <ChevronLeft size={24} className="text-slate-900" />
-          </Link>
-          <h1 className="text-base font-bold text-slate-900">Categorie</h1>
-          <div className="w-8"></div>
-        </div>
-
-        {/* Barra di ricerca opzionale per le categorie */}
-        <div className="relative pb-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Cerca uno sport..." 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-[14px] text-slate-900 font-medium focus:ring-1 focus:ring-slate-300 outline-none placeholder:text-slate-400"
-          />
-        </div>
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md px-4 py-4 flex justify-center border-b border-slate-100">
+        <h1 className="text-lg font-black text-slate-900 tracking-tight">Esplora Categorie</h1>
       </header>
 
       <div className="flex-1 px-4 pt-2 pb-24 overflow-y-auto">
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {SPORTS.map((cat, i) => (
-            <Link 
-              href={`/categories/${cat.id}`} 
+            <Link
+              href={`/categories/${cat.id}`}
               key={cat.id}
               className={`relative overflow-hidden rounded-2xl aspect-[1.3] shadow-sm transition-transform active:scale-95 ${cat.color}`}
             >
@@ -50,17 +35,25 @@ export default function CategoriesPage() {
               <div className={`absolute top-2 right-2 w-20 h-24 rotate-12 -skew-x-12 ${cat.shapeColor}`} />
 
               {/* Nome Sport */}
-              <h3 className="absolute top-3 left-3 text-white font-bold text-[15px] z-10 drop-shadow-sm tracking-tight">
+              <h3 className="absolute top-3 left-3 text-white font-bold text-[15px] z-20 drop-shadow-md tracking-tight">
                 {cat.label}
               </h3>
 
               {/* Atleta PNG (Da inserire in public/images/sports/) */}
-              <div className="absolute -bottom-2 right-0 w-[75%] h-[90%] z-10 flex items-end justify-end">
+              <div
+                className={`absolute ${cat.id === 'PADEL' ? '-top-2 h-[100%]' : '-bottom-2 h-[90%]'} w-[75%] z-10 flex items-end overflow-hidden ${['CALCETTO', 'NUOTO', 'BASKET', 'ARTI_MARZIALI', 'PALLAVOLO', 'BEACH_VOLLEY', 'PADEL'].includes(cat.id)
+                  ? 'right-0 justify-end'
+                  : 'left-0 justify-start'
+                  }`}
+              >
                 <Image
                   src={`/images/sports/${cat.imageId}.png`}
                   alt={cat.label}
                   fill
-                  className="object-contain object-bottom-right drop-shadow-xl"
+                  className={`object-contain drop-shadow-xl ${cat.id === 'PADEL' ? 'object-top scale-110' : 'object-bottom translate-y-2'} ${['CALCETTO', 'NUOTO', 'BASKET', 'ARTI_MARZIALI', 'PALLAVOLO', 'BEACH_VOLLEY', 'PADEL'].includes(cat.id)
+                    ? 'object-right translate-x-2'
+                    : 'object-left -translate-x-2'
+                    } ${['BASKET', 'ARTI_MARZIALI'].includes(cat.id) ? '-scale-x-100' : ''}`}
                   sizes="(max-width: 768px) 50vw, 33vw"
                   unoptimized
                 />

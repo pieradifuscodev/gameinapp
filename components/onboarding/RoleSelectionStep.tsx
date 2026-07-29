@@ -1,8 +1,8 @@
 import { Activity, Building2 } from "lucide-react";
 
 interface RoleSelectionStepProps {
-  role: "SPORTIVO" | "ORGANIZZATORE";
-  setRole: (role: "SPORTIVO" | "ORGANIZZATORE") => void;
+  role: "SPORTIVO" | "STRUTTURA";
+  setRole: (role: "SPORTIVO" | "STRUTTURA") => void;
   onNext: () => void;
 }
 
@@ -34,20 +34,20 @@ export function RoleSelectionStep({ role, setRole, onNext }: RoleSelectionStepPr
         </div>
 
         <div 
-          onClick={() => setRole("ORGANIZZATORE")}
+          onClick={() => setRole("STRUTTURA")}
           className={`p-4 rounded-2xl cursor-pointer border-2 transition-all ${
-            role === "ORGANIZZATORE" 
+            role === "STRUTTURA" 
             ? "border-primary bg-primary/5 shadow-sm" 
             : "border-slate-100 hover:border-slate-200 bg-white"
           }`}
         >
           <div className="flex items-center gap-3 mb-1">
-            <div className={`p-2 rounded-full ${role === "ORGANIZZATORE" ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
+            <div className={`p-2 rounded-full ${role === "STRUTTURA" ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
               <Building2 size={20} />
             </div>
-            <h3 className={`font-black ${role === "ORGANIZZATORE" ? "text-primary" : "text-slate-700"}`}>Organizzatore</h3>
+            <h3 className={`font-black ${role === "STRUTTURA" ? "text-primary" : "text-slate-700"}`}>Organizzatore</h3>
           </div>
-          <p className={`text-xs font-medium pl-12 leading-relaxed ${role === "ORGANIZZATORE" ? "text-primary/80" : "text-slate-500"}`}>
+          <p className={`text-xs font-medium pl-12 leading-relaxed ${role === "STRUTTURA" ? "text-primary/80" : "text-slate-500"}`}>
             Aggiungi la tua struttura sportiva, ricevi prenotazioni e gestisci i tuoi campi.
           </p>
         </div>

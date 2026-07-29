@@ -1,5 +1,5 @@
 import { User } from "lucide-react";
-import { ImageUpload } from "@/components/ui/ImageUpload";
+import { AvatarSelector } from "@/components/ui/AvatarSelector";
 
 interface BasicDataStepProps {
   name: string;
@@ -58,9 +58,9 @@ export function BasicDataStep({
         />
       </div>
       
-      <div className="flex flex-col items-center mb-4">
-        <label className="block text-xs font-bold text-slate-700 mb-2">Foto Profilo / Logo (opzionale)</label>
-        <ImageUpload value={avatar} onChange={setAvatar} />
+      <div className="flex flex-col mb-4">
+        <label className="block text-xs font-bold text-slate-700 mb-3 text-center">Scegli il tuo Avatar</label>
+        <AvatarSelector value={avatar} onChange={setAvatar} />
       </div>
 
       <div className="mt-auto pt-4 flex gap-2">

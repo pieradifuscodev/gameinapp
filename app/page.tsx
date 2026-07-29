@@ -11,6 +11,7 @@ import TournamentAdCards from "@/components/events/TournamentAdCards";
 import HomeHeader from "@/components/home/HomeHeader";
 import FilterModal from "@/components/home/FilterModal";
 import MapToggleButton from "@/components/home/MapToggleButton";
+import { FollowingFeed } from "@/components/home/FollowingFeed";
 
 type EventData = {
   id: string;
@@ -37,6 +38,7 @@ type GymData = {
 };
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<"EXPLORE" | "FOLLOWING">("EXPLORE");
   const [events, setEvents] = useState<EventData[]>([]);
   const [gyms, setGyms] = useState<GymData[]>([]);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -47,6 +49,8 @@ export default function Home() {
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"ALL" | "PRIVATE" | "ORGANIZER">("ALL");
+  const [dateFilter, setDateFilter] = useState<"ALL" | "TODAY" | "TOMORROW" | "WEEK">("ALL");
+  const [timeFilter, setTimeFilter] = useState<"ALL" | "MORNING" | "AFTERNOON" | "EVENING">("ALL");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { coords, source: geoSource, loading: geoLoading, error: geoError, retry: retryGeo } = useGeolocation();
@@ -67,7 +71,7 @@ export default function Home() {
       setFetchError(null);
       try {
         const sportQuery = selectedSport ? `&sport=${selectedSport}` : "";
-        const res = await fetch(`/api/events/search?lat=${coords.lat}&lng=${coords.lng}&radius=${radius}${sportQuery}`);
+        const res = await fetch(`/api/events/search?lat=${coords.lat}&lng=${coords.lng}&radius=${radius}${sportQuery}&date=${dateFilter}&time=${timeFilter}`);
         if (!res.ok) throw new Error("Errore durante la ricerca degli eventi");
         const data = await res.json();
         setEvents(data.events || []);
@@ -79,7 +83,7 @@ export default function Home() {
       }
     };
     fetchEvents();
-  }, [coords, radius, selectedSport]);
+  }, [coords, radius, selectedSport, dateFilter, timeFilter]);
 
   const promotedEvents = events.filter(e => e.creator.role === "ORGANIZER").slice(0, 5);
 
@@ -104,11 +108,29 @@ export default function Home() {
         greeting={greeting}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        hasFilters={filterType !== 'ALL' || selectedSport !== null}
+        hasFilters={filterType !== 'ALL' || selectedSport !== null || dateFilter !== 'ALL' || timeFilter !== 'ALL'}
         onOpenFilter={() => setIsFilterOpen(true)}
       />
 
-      {loading ? (
+      {/* ── TABS ── */}
+      <div className="px-4 py-2 flex items-center gap-4 border-b border-slate-100">
+        <button 
+          onClick={() => setActiveTab("EXPLORE")}
+          className={`pb-3 border-b-2 text-[15px] font-bold transition-colors ${activeTab === 'EXPLORE' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+        >
+          Esplora
+        </button>
+        <button 
+          onClick={() => setActiveTab("FOLLOWING")}
+          className={`pb-3 border-b-2 text-[15px] font-bold transition-colors ${activeTab === 'FOLLOWING' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+        >
+          Seguiti
+        </button>
+      </div>
+
+      {activeTab === "FOLLOWING" ? (
+        <FollowingFeed />
+      ) : loading ? (
         <div className="p-8 flex flex-col items-center justify-center min-h-[40vh] text-slate-400">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-slate-900 mb-4" />
           <p className="font-bold text-sm">Ricerca in corso...</p>
@@ -194,6 +216,10 @@ export default function Home() {
           setRadius={setRadius}
           filterType={filterType}
           setFilterType={setFilterType}
+          dateFilter={dateFilter}
+          setDateFilter={setDateFilter}
+          timeFilter={timeFilter}
+          setTimeFilter={setTimeFilter}
         />
       )}
 

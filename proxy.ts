@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
 
-    const isPublicRoute = ["/login", "/register", "/api/auth"].some((path) =>
+    const isPublicRoute = ["/login", "/register", "/forgot-password", "/reset-password", "/api/auth"].some((path) =>
       pathname.startsWith(path)
     );
 
@@ -16,7 +16,7 @@ export default withAuth(
         !!token.username &&
         (
           (token.role === "SPORTIVO" && token.latitude != null && token.longitude != null) ||
-          (token.role === "ORGANIZZATORE" && !!token.companyName && token.latitude != null && token.longitude != null)
+          (token.role === "STRUTTURA" && !!token.companyName && token.latitude != null && token.longitude != null)
         );
 
       if (isProfileComplete) {
@@ -32,7 +32,7 @@ export default withAuth(
         !!token.username &&
         (
           (token.role === "SPORTIVO" && token.latitude != null && token.longitude != null) ||
-          (token.role === "ORGANIZZATORE" && !!token.companyName && token.latitude != null && token.longitude != null)
+          (token.role === "STRUTTURA" && !!token.companyName && token.latitude != null && token.longitude != null)
         );
 
       if (!isProfileComplete && pathname !== "/onboarding" && !pathname.startsWith("/api/")) {
@@ -51,7 +51,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ req, token }) => {
         const { pathname } = req.nextUrl;
-        const isPublicRoute = ["/login", "/register", "/api/auth"].some((path) =>
+        const isPublicRoute = ["/login", "/register", "/forgot-password", "/reset-password", "/api/auth"].some((path) =>
           pathname.startsWith(path)
         );
         

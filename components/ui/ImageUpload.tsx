@@ -6,44 +6,41 @@ export function ImageUpload({ value, onChange }: { value: string; onChange: (bas
   const [preview, setPreview] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // Mostriamo subito una preview locale
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 256;
-        const MAX_HEIGHT = 256;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, width, height);
-        
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-        setPreview(dataUrl);
-        onChange(dataUrl);
-      };
-      img.src = event.target?.result as string;
+      setPreview(event.target?.result as string);
     };
     reader.readAsDataURL(file);
+
+    // Carichiamo sul server
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      
+      // Passiamo l'URL pubblico (es. /uploads/hash.jpg) al componente genitore
+      onChange(data.url);
+      setPreview(data.url);
+    } catch (error) {
+      console.error("Errore di upload", error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (

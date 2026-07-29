@@ -5,35 +5,62 @@ import { CheckCircle2, Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-hot-toast";
 
 interface EventClientActionsProps {
   eventId: string;
   price: number | null;
   spotsLeft: number;
   isFull: boolean;
+  isCreator?: boolean;
+  isParticipating?: boolean;
 }
 
-export default function EventClientActions({ eventId, price, spotsLeft, isFull }: EventClientActionsProps) {
+export default function EventClientActions({ eventId, price, spotsLeft, isFull, isCreator, isParticipating }: EventClientActionsProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<'idle' | 'processing' | 'success'>('idle');
+  const [loading, setLoading] = useState(false);
 
   const handleActionClick = () => {
-    setIsModalOpen(true);
+    if (isParticipating) {
+      handleLeave();
+    } else {
+      setIsModalOpen(true);
+    }
   };
 
-  const handleConfirm = () => {
+  const handleLeave = async () => {
+    if (!confirm("Sei sicuro di voler annullare la tua partecipazione?")) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/events/${eventId}/join`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Errore");
+      toast.success("Partecipazione annullata");
+      router.refresh();
+    } catch (e: any) {
+      toast.error("Impossibile annullare la partecipazione");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirm = async () => {
     setPaymentState('processing');
-    setTimeout(() => {
+    try {
+      const res = await fetch(`/api/events/${eventId}/join`, { method: "POST" });
+      if (!res.ok) throw new Error("Errore iscrizione");
       setPaymentState('success');
-    }, 2000);
+      router.refresh();
+    } catch (e: any) {
+      toast.error("Errore durante l'iscrizione");
+      setPaymentState('idle');
+      setIsModalOpen(false);
+    }
   };
 
   const handleClose = () => {
     setIsModalOpen(false);
-    if (paymentState === 'success') {
-      router.push("/");
-    }
   };
 
   const isFree = !price || price === 0;
@@ -42,27 +69,63 @@ export default function EventClientActions({ eventId, price, spotsLeft, isFull }
     <>
       <div className="fixed bottom-0 left-0 right-0 px-5 py-4 pb-8 bg-white border-t border-slate-200 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-4 max-w-lg mx-auto">
-          <div className="flex flex-col flex-1">
-            <span className="text-[17px] font-bold text-slate-900">
-              {isFree ? 'Gratis' : `€ ${price?.toFixed(2)}`}
-            </span>
-            <span className={`text-[12px] font-bold ${spotsLeft <= 2 ? 'text-red-500' : 'text-slate-500'}`}>
-              {isFull ? 'Nessun posto disponibile' : `${spotsLeft} posti rimasti`}
-            </span>
-          </div>
+          {isCreator ? (
+            <>
+              <Button 
+                variant="outline"
+                onClick={async () => {
+                  if (confirm("Sei sicuro di voler eliminare questo evento?")) {
+                    try {
+                      const res = await fetch(`/api/events/${eventId}`, { method: 'DELETE' });
+                      if (!res.ok) throw new Error("Errore eliminazione");
+                      toast.success("Evento eliminato");
+                      router.push('/dashboard');
+                      router.refresh();
+                    } catch (e: any) {
+                      toast.error("Errore eliminazione");
+                    }
+                  }
+                }}
+                className="flex-1 rounded-xl font-bold border-red-200 text-red-600 hover:bg-red-50"
+              >
+                Elimina
+              </Button>
+              <Button 
+                onClick={() => router.push(`/events/${eventId}/edit`)}
+                className="flex-1 rounded-xl bg-slate-900 text-white font-bold active:scale-95"
+              >
+                Modifica
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col flex-1">
+                <span className="text-[17px] font-bold text-slate-900">
+                  {isFree ? 'Gratis' : `€ ${price?.toFixed(2)}`}
+                </span>
+                <span className={`text-[12px] font-bold ${spotsLeft <= 2 ? 'text-red-500' : 'text-slate-500'}`}>
+                  {isFull ? 'Nessun posto disponibile' : `${spotsLeft} posti rimasti`}
+                </span>
+              </div>
 
-          <Button 
-            disabled={isFull}
-            onClick={handleActionClick}
-            size="lg"
-            className={`px-8 rounded-xl font-bold transition-all ${
-              isFull 
-                ? 'bg-slate-100 text-slate-400' 
-                : 'bg-slate-900 text-white active:scale-95'
-            }`}
-          >
-            {isFull ? 'Completo' : (isFree ? 'Partecipa' : 'Iscriviti')}
-          </Button>
+              <Button 
+                disabled={isFull && !isParticipating || loading}
+                onClick={handleActionClick}
+                size="lg"
+                className={`px-8 rounded-xl font-bold transition-all ${
+                  isParticipating
+                    ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
+                    : isFull 
+                      ? 'bg-slate-100 text-slate-400' 
+                      : 'bg-slate-900 text-white active:scale-95'
+                }`}
+              >
+                {loading ? <Loader2 className="animate-spin" size={20}/> : 
+                 isParticipating ? 'Annulla' :
+                 isFull ? 'Completo' : (isFree ? 'Partecipa' : 'Iscriviti')}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

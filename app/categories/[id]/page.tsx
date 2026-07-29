@@ -5,7 +5,7 @@ import { getSportDetails } from "@/lib/sports";
 import { CompactEventCard } from "@/components/events/CompactEventCard";
 import { notFound } from "next/navigation";
 
-export default async function CategoryPage({ params }: { params: { id: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
   // Verify sport exists

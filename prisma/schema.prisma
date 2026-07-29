@@ -25,6 +25,7 @@ model User {
   maxNotificationDist Int       @default(20) 
   emailVerified       DateTime?
   image               String?
+  facilityImages      String[]
   
   createdEvents       Event[]   @relation("EventCreator")
   participations      Event[]   @relation("EventParticipants")

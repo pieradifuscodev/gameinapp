@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Save, User, AlertCircle, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
-import { ImageUpload } from "@/components/ui/ImageUpload";
-
+import { AvatarSelector } from "@/components/ui/AvatarSelector";
+import { MultiImageUpload } from "@/components/ui/MultiImageUpload";
 export default function EditProfilePage() {
   const { data: session, update } = useSession();
   const router = useRouter();
@@ -19,25 +19,39 @@ export default function EditProfilePage() {
   const [bio, setBio] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
+  const [facilityImages, setFacilityImages] = useState<string[]>([]);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const isOrganizer = (session?.user as any)?.role === "ORGANIZZATORE";
+  const isOrganizer = (session?.user as any)?.role === "STRUTTURA";
 
   useEffect(() => {
-    if (session?.user) {
-      const u = session.user as any;
-      setName(u.name || "");
-      setSurname(u.surname || "");
-      setUsername(u.username || "");
-      setEmail(u.email || "");
-      setAvatar(u.avatar || "");
-      setBio(u.bio || "");
-      setCompanyName(u.companyName || "");
-      setVatNumber(u.vatNumber || "");
+    const userId = (session?.user as any)?.id;
+    if (userId) {
+      const fetchProfile = async () => {
+        try {
+          const res = await fetch("/api/user/profile");
+          if (res.ok) {
+            const data = await res.json();
+            const u = data.user;
+            setName(u.name || "");
+            setSurname(u.surname || "");
+            setUsername(u.username || "");
+            setEmail(u.email || "");
+            setAvatar(u.avatar || "");
+            setBio(u.bio || "");
+            setCompanyName(u.companyName || "");
+            setVatNumber(u.vatNumber || "");
+            setFacilityImages(u.facilityImages || []);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchProfile();
     }
-  }, [session]);
+  }, [(session?.user as any)?.id]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,14 +63,15 @@ export default function EditProfilePage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name ? name : undefined,
-          surname: surname ? surname : undefined,
-          username: username ? username : undefined,
-          email: email ? email : undefined,
-          avatar: avatar ? avatar : undefined,
-          bio: bio !== "" ? bio : undefined, // Allow empty bio? Let's just pass bio directly
-          companyName: companyName ? companyName : undefined,
-          vatNumber: vatNumber ? vatNumber : undefined,
+          name,
+          surname,
+          username,
+          email,
+          avatar,
+          bio,
+          companyName,
+          vatNumber,
+          facilityImages,
         }),
       });
 
@@ -74,7 +89,8 @@ export default function EditProfilePage() {
         avatar,
         bio,
         companyName,
-        vatNumber
+        vatNumber,
+        facilityImages
       });
       
       setMessage({ type: 'success', text: "Profilo aggiornato con successo!" });
@@ -113,9 +129,9 @@ export default function EditProfilePage() {
             </h2>
             
             <div className="flex flex-col gap-3">
-              <div className="flex flex-col items-center mb-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-2">Foto Profilo</label>
-                <ImageUpload value={avatar} onChange={setAvatar} />
+              <div className="flex flex-col mb-4">
+                <label className="block text-xs font-semibold text-gray-600 mb-3 text-center">Scegli il tuo Avatar</label>
+                <AvatarSelector value={avatar} onChange={setAvatar} />
               </div>
 
               <div className="flex gap-3">
@@ -177,9 +193,9 @@ export default function EditProfilePage() {
           {isOrganizer && (
             <section className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">
-                Dati Aziendali
+                Dati Aziendali & Struttura
               </h2>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nome Struttura/Azienda</label>
                   <input
@@ -197,6 +213,10 @@ export default function EditProfilePage() {
                     onChange={(e) => setVatNumber(e.target.value)}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/80"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-2">Foto della Struttura / Campi</label>
+                  <MultiImageUpload value={facilityImages} onChange={setFacilityImages} />
                 </div>
               </div>
             </section>

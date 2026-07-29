@@ -17,7 +17,7 @@ export function OnboardingForm() {
   const [error, setError] = useState("");
 
   // Ruolo
-  const [role, setRole] = useState<"SPORTIVO" | "ORGANIZZATORE">("SPORTIVO");
+  const [role, setRole] = useState<"SPORTIVO" | "STRUTTURA">("SPORTIVO");
 
   // Dati Base
   const [name, setName] = useState("");
@@ -36,7 +36,7 @@ export function OnboardingForm() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   
-  const isOrganizer = role === "ORGANIZZATORE";
+  const isOrganizer = role === "STRUTTURA";
 
   // Pre-fill
   useEffect(() => {
