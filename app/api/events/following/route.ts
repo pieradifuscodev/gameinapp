@@ -26,7 +26,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Utente non trovato" }, { status: 404 });
     }
 
-    const followingIds = userWithFollowing.following.map(f => f.id);
+    const followingIds = userWithFollowing.following.map((f: any) => f.id);
 
     if (followingIds.length === 0) {
       return NextResponse.json({ events: [] }, { status: 200 });
