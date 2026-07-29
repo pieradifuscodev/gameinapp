@@ -77,7 +77,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       return NextResponse.json({ error: "Evento non trovato" }, { status: 404 });
     }
 
-    if (!event.participants.some(p => p.id === userId)) {
+    if (!event.participants.some((p: any) => p.id === userId)) {
       return NextResponse.json({ error: "Non sei iscritto" }, { status: 400 });
     }
 
