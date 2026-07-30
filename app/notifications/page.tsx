@@ -85,21 +85,20 @@ export default function NotificationsPage() {
     }
   };
 
-  if (loading) return <div className="h-screen bg-slate-50 flex items-center justify-center">Caricamento...</div>;
+  if (loading) return <div className="h-screen bg-[#0C0C0E] flex items-center justify-center text-white font-black">Caricamento...</div>;
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-white pb-safe">
-      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-base font-bold text-slate-900 tracking-tight">Notifiche</h1>
-        </div>
+    <div className="flex flex-col min-h-screen bg-[#0C0C0E] pb-safe text-white">
+      {/* Sub-header actions */}
+      <div className="flex justify-between items-center px-4 py-3 bg-[#16161A] border-b border-[#222226]">
+        <span className="text-xs font-bold text-[#8E8E93] uppercase tracking-wide">Le tue notifiche</span>
         <div className="flex items-center gap-3">
           {permissionState === 'granted' ? (
             <div 
               onClick={() => toast.success('Riceverai regolarmente gli inviti per le partite!')}
-              className="w-8 h-8 rounded-full bg-slate-50 text-slate-900 flex items-center justify-center cursor-pointer border border-slate-200"
+              className="w-8 h-8 rounded-full bg-[#0C0C0E] text-[#CCFF00] flex items-center justify-center cursor-pointer border border-[#222226]"
             >
               <Bell size={16} />
             </div>
@@ -115,7 +114,7 @@ export default function NotificationsPage() {
                   });
                 }
               }}
-              className="w-8 h-8 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center cursor-pointer border border-slate-200"
+              className="w-8 h-8 rounded-full bg-[#0C0C0E] text-[#8E8E93] flex items-center justify-center cursor-pointer border border-[#222226]"
             >
               <BellOff size={16} />
             </div>
@@ -125,7 +124,7 @@ export default function NotificationsPage() {
             <button 
               onClick={() => markAsRead()} 
               disabled={isMarkingRead}
-              className={`text-[11px] font-bold text-slate-900 active:scale-95 transition-transform bg-slate-100 px-3 py-1.5 rounded-full ${isMarkingRead ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`text-[11px] font-black uppercase tracking-wider text-black bg-[#CCFF00] active:scale-95 transition-transform px-3 py-1.5 rounded-full ${isMarkingRead ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isMarkingRead ? '...' : 'Segna lette'}
             </button>
@@ -133,14 +132,14 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      <div className="flex-1 px-4">
+      <div className="flex-1 px-4 mt-2">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-center mt-10">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4 border border-slate-100">
+            <div className="w-16 h-16 bg-[#16161A] border border-[#222226] rounded-xl flex items-center justify-center text-[#8E8E93] mb-4">
               <Bell size={32} />
             </div>
-            <h2 className="text-slate-900 font-bold mb-1">Nessuna notifica</h2>
-            <p className="text-sm text-slate-500">Non hai ancora ricevuto notifiche.</p>
+            <h2 className="text-white font-black mb-1">Nessuna notifica</h2>
+            <p className="text-sm text-[#8E8E93]">Non hai ancora ricevuto notifiche.</p>
           </div>
         ) : (
           <div className="flex flex-col pb-20">
@@ -148,32 +147,32 @@ export default function NotificationsPage() {
               <div 
                 key={notification.id} 
                 onClick={() => handleNotificationClick(notification)}
-                className={`py-4 border-b border-slate-100 cursor-pointer active:bg-slate-50 transition-colors flex gap-3 ${
-                  notification.isRead ? "" : "bg-slate-50 -mx-4 px-4"
+                className={`py-4 border-b border-[#222226] cursor-pointer active:bg-[#16161A] transition-colors flex gap-3 ${
+                  notification.isRead ? "" : "bg-[#16161A]/40 -mx-4 px-4"
                 }`}
               >
                 <div className="pt-1 flex-shrink-0">
                   {notification.type === "SYSTEM" ? (
-                    <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#0C0C0E] border border-[#222226] text-[#CCFF00] flex items-center justify-center">
                       <Bell size={18} />
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#0C0C0E] border border-[#222226] text-[#00F0FF] flex items-center justify-center">
                       <Circle size={18} />
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-0.5">
-                    <h3 className={`text-[14px] leading-tight ${notification.isRead ? "font-semibold text-slate-800" : "font-bold text-slate-900"}`}>
+                    <h3 className={`text-[14px] leading-tight ${notification.isRead ? "font-bold text-white" : "font-black text-[#CCFF00]"}`}>
                       {notification.title}
                     </h3>
                     {!notification.isRead && (
-                      <span className="w-2 h-2 rounded-full bg-slate-900 flex-shrink-0 mt-1"></span>
+                      <span className="w-2 h-2 rounded-full bg-[#CCFF00] flex-shrink-0 mt-1"></span>
                     )}
                   </div>
-                  <p className="text-[13px] text-slate-600 leading-snug mb-1">{notification.message}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                  <p className="text-[13px] text-[#8E8E93] leading-snug mb-1 font-medium">{notification.message}</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
                     {new Date(notification.createdAt).toLocaleDateString('it-IT')} • {new Date(notification.createdAt).toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'})}
                   </p>
                 </div>

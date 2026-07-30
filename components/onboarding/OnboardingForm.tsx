@@ -116,22 +116,24 @@ export function OnboardingForm() {
   };
 
   if (!session) return (
-    <div className="h-screen flex items-center justify-center bg-slate-50">
-      <div className="text-slate-400 font-bold animate-pulse">Caricamento...</div>
+    <div className="h-screen flex items-center justify-center bg-[#0C0C0E]">
+      <div className="text-[#8E8E93] font-black uppercase tracking-wider text-xs animate-pulse">Caricamento...</div>
     </div>
   );
 
+  const accentColor = isOrganizer ? '#00F0FF' : '#CCFF00';
+
   return (
-    <div className="flex flex-col h-full relative pb-safe overflow-hidden bg-slate-50">
+    <div className="flex flex-col h-full relative pb-safe overflow-hidden bg-[#0C0C0E]">
       <div className="flex-1 px-5 pt-10 pb-6 z-10 overflow-y-auto flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+          <div className="bg-[#16161A] p-2.5 rounded-xl border border-[#222226]">
             <img src="/assets/logo.png" alt="Logo" width={36} height={36} className="object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">Completa il Profilo</h1>
-            <p className="text-slate-500 text-xs font-medium mt-0.5">
+            <h1 className="text-2xl font-black text-white tracking-tight leading-tight uppercase">Completa il Profilo</h1>
+            <p className="text-[#8E8E93] text-xs font-bold mt-0.5">
               {step === 1 ? "Scegli come vuoi usare l'app" : (isOrganizer ? "Dati aziendali e della struttura" : "Raccontaci di te e dei tuoi sport")}
             </p>
           </div>
@@ -140,16 +142,18 @@ export function OnboardingForm() {
         {/* Step indicator */}
         <div className="flex gap-2 mb-2">
           {[1,2,3,4].map(s => (
-            <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-              s <= step ? 'bg-primary' : 'bg-slate-200'
-            }`} />
+            <div 
+              key={s} 
+              className="h-1.5 flex-1 rounded-full transition-all duration-300"
+              style={{ backgroundColor: s <= step ? accentColor : '#222226' }}
+            />
           ))}
         </div>
 
         {/* Minimal Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col flex-1 min-h-[400px]">
+        <div className="bg-[#16161A] rounded-2xl border border-[#222226] p-5 shadow-2xl flex flex-col flex-1 min-h-[400px]">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl flex gap-2 items-center mb-4 border border-red-100 text-sm">
+            <div className="bg-red-500/10 text-red-400 p-3.5 rounded-xl mb-4 border border-red-500/20 text-xs font-semibold">
               {error}
             </div>
           )}
@@ -173,6 +177,7 @@ export function OnboardingForm() {
                 if(!name || !surname || !username) setError("Nome, cognome e username richiesti.");
                 else { setError(""); setStep(3); }
               }}
+              isOrganizer={isOrganizer}
             />
           )}
 

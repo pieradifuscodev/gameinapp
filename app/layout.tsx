@@ -29,7 +29,7 @@ export const viewport: Viewport = {
 };
 
 import { Providers } from "./providers";
-import BottomNav from "@/components/layout/BottomNav";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
@@ -42,40 +42,34 @@ export default function RootLayout({
       lang="it"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      {/*
-        h-[100dvh]       → dynamic viewport height (handles mobile browser chrome)
-        overflow-hidden  → prevents body scroll; only <main> scrolls
-        flex flex-col    → stacks <main> + <BottomNav> vertically
-        overscroll-none  → no rubber-band bleed on iOS
-      */}
-      <body className="h-[100dvh] overflow-hidden flex flex-col bg-gray-50 text-gray-900 overscroll-none">
+      <body className="h-[100dvh] overflow-hidden flex flex-col bg-[#0C0C0E] text-white overscroll-none">
         <Providers>
           <Toaster
             position="top-center"
             toastOptions={{
               style: {
-                borderRadius: "16px",
-                background: "#1f2937",
-                color: "#fff",
-                fontSize: "14px",
-                fontWeight: "500",
+                borderRadius: "12px",
+                background: "#16161A",
+                color: "#FFFFFF",
+                border: "1px solid #222226",
+                fontSize: "12px",
+                fontWeight: "800",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
               },
               success: {
-                iconTheme: { primary: "#4ade80", secondary: "#fff" },
+                iconTheme: { primary: "#CCFF00", secondary: "#000000" },
+              },
+              error: {
+                iconTheme: { primary: "#FF3B30", secondary: "#FFFFFF" },
               },
             }}
           />
-          {/*
-            flex-1          → fills all space above BottomNav
-            overflow-y-auto → scrollable content area
-            hide-scrollbar  → native feel, no visible scrollbar
-            scroll-touch    → momentum scrolling on iOS
-            overscroll-none → contained bounce
-          */}
-          <main className="flex-1 overflow-y-auto hide-scrollbar scroll-touch overscroll-none flex flex-col">
+          <LayoutWrapper>
             {children}
-          </main>
-          <BottomNav />
+          </LayoutWrapper>
         </Providers>
       </body>
     </html>

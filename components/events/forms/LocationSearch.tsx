@@ -20,10 +20,12 @@ interface LocationSearchProps {
   locationValue: string;
   onLocationSelect: (location: string, lat: number, lng: number, gymId: string) => void;
   error?: string;
+  isOrganizer?: boolean;
 }
 
-export function LocationSearch({ gyms, locationValue, onLocationSelect, error }: LocationSearchProps) {
+export function LocationSearch({ gyms, locationValue, onLocationSelect, error, isOrganizer = false }: LocationSearchProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const accentColor = isOrganizer ? '#00F0FF' : '#CCFF00';
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -64,9 +66,9 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
   ) : [];
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-1.5">
-        <MapPin size={18} className="text-primary/80" /> Luogo dell'incontro
+    <div className="bg-[#16161A] p-4 rounded-xl border border-[#222226] shadow-sm">
+      <h3 className="font-black text-white mb-3 flex items-center gap-1.5 uppercase tracking-wide text-xs">
+        <MapPin size={16} style={{ color: accentColor }} /> Luogo dell'incontro
       </h3>
       
       <div className="relative">
@@ -81,16 +83,17 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
           onFocus={() => setIsOpen(true)}
           disabled={!ready}
           placeholder={isLoaded ? "Cerca indirizzo o struttura..." : "Caricamento mappa..."}
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary/80"
+          className="w-full bg-[#0C0C0E] border border-[#222226] rounded-xl px-4 py-3 text-sm text-white outline-none placeholder:text-[#8E8E93] focus:border-accent"
+          style={{ borderColor: isOpen ? accentColor : '#222226' }}
         />
-        {error && <p className="text-red-500 text-xs mt-1.5">{error}</p>}
+        {error && <p className="text-red-500 text-xs mt-1.5 font-semibold">{error}</p>}
         
         {isOpen && (searchValue.length > 1) && (
-          <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-30 mt-1.5 w-full bg-[#16161A] border border-[#222226] rounded-xl shadow-2xl max-h-60 overflow-y-auto">
             {/* Nostre Strutture */}
             {filteredGyms.length > 0 && (
-              <div className="bg-primary/10/50">
-                <div className="px-3 py-1.5 text-[10px] font-bold text-blue-800 uppercase tracking-wider border-b border-primary/20">Strutture Registrate</div>
+              <div className="bg-[#0C0C0E]/30">
+                <div className="px-3 py-2 text-[10px] font-black uppercase tracking-wider border-b border-[#222226]" style={{ color: accentColor }}>Strutture Registrate</div>
                 {filteredGyms.map(g => (
                   <div 
                     key={g.id} 
@@ -100,12 +103,12 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
                       clearSuggestions();
                       setIsOpen(false);
                     }}
-                    className="px-3 py-2.5 text-sm cursor-pointer hover:bg-primary/10 flex items-start gap-2 border-b border-primary/10/50 last:border-0"
+                    className="px-3 py-2.5 text-sm cursor-pointer hover:bg-[#0C0C0E]/50 flex items-start gap-2 border-b border-[#222226]/40 last:border-0"
                   >
-                    <MapPinIcon size={16} className="text-primary/80 mt-0.5 shrink-0" />
+                    <MapPinIcon size={16} className="mt-0.5 shrink-0" style={{ color: accentColor }} />
                     <div>
-                      <div className="font-bold text-gray-900">{g.name}</div>
-                      <div className="text-xs text-gray-500 truncate">{g.address}</div>
+                      <div className="font-bold text-white">{g.name}</div>
+                      <div className="text-xs text-[#8E8E93] truncate">{g.address}</div>
                     </div>
                   </div>
                 ))}
@@ -115,7 +118,7 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
             {/* Google Places */}
             {status === "OK" && (
               <div>
-                {filteredGyms.length > 0 && <div className="px-3 py-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-t border-gray-100">Altri Luoghi (Google Maps)</div>}
+                {filteredGyms.length > 0 && <div className="px-3 py-2 text-[10px] font-black text-[#8E8E93] uppercase tracking-wider border-t border-[#222226]/50">Altri Luoghi (Google Maps)</div>}
                 {placesData.map(({ place_id, description }) => (
                   <div 
                     key={place_id} 
@@ -131,10 +134,10 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
                         console.error("Errore Geocoding: ", error);
                       }
                     }}
-                    className="px-3 py-2.5 text-sm cursor-pointer hover:bg-gray-50 flex items-start gap-2 border-b border-gray-50 last:border-0"
+                    className="px-3 py-2.5 text-sm cursor-pointer hover:bg-[#0C0C0E]/50 flex items-start gap-2 border-b border-[#222226]/40 last:border-0"
                   >
-                    <MapPin size={16} className="text-gray-400 mt-0.5 shrink-0" />
-                    <span className="text-gray-700">{description}</span>
+                    <MapPin size={16} className="text-[#8E8E93] mt-0.5 shrink-0" />
+                    <span className="text-white font-medium">{description}</span>
                   </div>
                 ))}
               </div>
@@ -144,7 +147,7 @@ export function LocationSearch({ gyms, locationValue, onLocationSelect, error }:
         
         {/* Riepilogo selezione */}
         {locationValue && !isOpen && (
-          <div className="mt-2 text-xs text-primary flex items-center gap-1 font-medium bg-primary/10 p-2 rounded-md">
+          <div className="mt-2 text-xs flex items-center gap-1.5 font-bold p-2.5 rounded-lg" style={{ color: accentColor, backgroundColor: `${accentColor}15` }}>
             <MapPin size={14} /> Luogo confermato
           </div>
         )}

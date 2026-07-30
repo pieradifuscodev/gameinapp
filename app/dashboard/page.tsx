@@ -33,7 +33,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   if (!userProfile) return <div>Utente non trovato</div>;
 
   return (
-    <div className="flex flex-col h-full bg-white relative">
+    <div className="flex flex-col h-full bg-[#0C0C0E] relative">
       <ProfileHeader 
         user={userProfile} 
         stats={{

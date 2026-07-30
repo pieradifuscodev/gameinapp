@@ -1,110 +1,81 @@
-import { Trophy, Users, ChevronRight } from "lucide-react";
+import { Trophy, ChevronRight, Zap } from "lucide-react";
+import { getSportIconUrl } from "@/lib/sports";
 
-const PLACEHOLDER_TOURNAMENTS = [
+const AD_TOURNAMENTS = [
   {
     id: "t1",
-    title: "Torneo Estivo di Calcetto",
-    sport: { icon: "⚽️", label: "Calcetto" },
-    organizer: "ASD Sport Club Milano",
-    date: "15 Ago 2025",
-    prize: "500€",
-    slots: 16,
-    slotsLeft: 4,
-    gradient: "from-[#1f4a23] to-[#0d9488]",
-    accentColor: "#4ade80",
+    title: "Champions Calcetto Cup",
+    subtitle: "Premio 500€",
+    sport: { id: "CALCETTO", label: "Calcetto" },
+    organizer: "Milano Sport",
   },
   {
     id: "t2",
-    title: "Champions Padel Cup",
-    sport: { icon: "🏸", label: "Padel" },
-    organizer: "Padel Arena Roma",
-    date: "22 Ago 2025",
-    prize: "300€",
-    slots: 32,
-    slotsLeft: 12,
-    gradient: "from-[#0284c7] to-[#6d28d9]",
-    accentColor: "#7dd3fc",
-  },
-  {
-    id: "t3",
-    title: "Open Basket 3vs3",
-    sport: { icon: "🏀", label: "Basket" },
-    organizer: "Palasport Napoli",
-    date: "5 Set 2025",
-    prize: "200€",
-    slots: 24,
-    slotsLeft: 8,
-    gradient: "from-[#bf591f] to-[#d97706]",
-    accentColor: "#fb923c",
+    title: "Padel Summer Open",
+    subtitle: "In palio racchette PRO",
+    sport: { id: "PADEL", label: "Padel" },
+    organizer: "Roma Padel Club",
   },
 ];
 
 export default function TournamentAdCards() {
   return (
-    <section>
-      <div className="flex items-center justify-between mb-3 px-6">
+    <section className="mb-4">
+      <div className="flex items-center justify-between mb-4 px-6">
         <div className="flex items-center gap-2">
-          <Trophy size={18} className="text-amber-500" />
-          <h2 className="font-black text-gray-900 text-lg">Tornei in Evidenza</h2>
+          <Trophy size={18} className="text-[#CCFF00]" />
+          <h2 className="font-black text-white text-lg tracking-tight">Tornei in Evidenza</h2>
         </div>
-        <button className="text-xs font-bold text-primary flex items-center gap-0.5">
+        <button className="text-xs font-bold text-[#8E8E93] hover:text-white transition-colors flex items-center gap-0.5">
           Vedi tutti <ChevronRight size={14} />
         </button>
       </div>
 
-      <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-3 snap-x px-6 scroll-px-6">
-        {PLACEHOLDER_TOURNAMENTS.map((t) => {
-          const fillPct = Math.round(((t.slots - t.slotsLeft) / t.slots) * 100);
-          return (
-            <div
-              key={t.id}
-              className="snap-start shrink-0 w-72 rounded-2xl bg-white border border-slate-200 p-4 relative overflow-hidden flex flex-col gap-3 active:bg-slate-50 transition-colors cursor-pointer"
-            >
-              <div className="absolute top-4 right-4 bg-amber-50 text-amber-700 text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md border border-amber-200">
-                In Arrivo
-              </div>
-              
-              <div className="relative z-10 flex gap-3 items-center">
-                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-2xl border border-slate-100 shrink-0">
-                  {t.sport.icon}
-                </div>
+      <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-6 snap-x px-6 scroll-px-6">
+        {AD_TOURNAMENTS.map((t) => (
+          <div
+            key={t.id}
+            className={`snap-start shrink-0 w-[300px] h-auto min-h-[170px] rounded-[12px] bg-[#16161A] border border-[#222226] shadow-sm hover:border-[#CCFF00]/50 relative overflow-hidden group cursor-pointer transition-colors`}
+          >
+            {/* Animated shimmer overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#CCFF00]/5 to-transparent -translate-x-[150%] animate-[shimmer_2.5s_infinite] skew-x-[-20deg]" />
+            
+            {/* Inner Content */}
+            <div className="w-full h-full p-5 flex flex-col justify-between relative z-10 overflow-hidden">
+              <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{t.sport.label}</p>
-                  <h3 className="text-slate-900 font-bold text-[16px] leading-tight pr-10 line-clamp-2">{t.title}</h3>
+                  <div className={`inline-flex items-center gap-1 bg-[#CCFF00]/10 text-[#CCFF00] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-[8px] mb-3`}>
+                    <Zap size={10} className="fill-[#CCFF00]" /> Sponsorizzato
+                  </div>
+                  <h3 className="text-white font-black text-xl leading-tight tracking-tight">
+                    {t.title}
+                  </h3>
+                  <p className="text-[#8E8E93] text-xs font-normal mt-1">
+                    {t.subtitle}
+                  </p>
+                </div>
+                
+                <div className="w-12 h-12 bg-[#0C0C0E] border border-[#222226] rounded-[12px] flex items-center justify-center text-2xl transform group-active:scale-90 transition-transform shrink-0 ml-3">
+                  <img src={getSportIconUrl(t.sport.id)} alt={t.sport.label} className="w-6 h-6 object-contain" />
                 </div>
               </div>
-              
-              <p className="text-slate-600 text-xs font-medium relative z-10 truncate mt-1">
-                📍 {t.organizer}
-              </p>
-              
-              <div className="flex items-center gap-2 relative z-10">
-                <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg">
-                  <Trophy size={12} className="text-amber-500" />
-                  <span className="text-slate-900 font-bold text-sm">{t.prize}</span>
+
+              <div className="flex items-center justify-between mt-5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-[8px] bg-[#222226] flex items-center justify-center text-[10px] font-black text-white">
+                    {t.organizer[0]}
+                  </div>
+                  <span className="text-white text-xs font-bold">
+                    {t.organizer}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg">
-                  <Users size={12} className="text-slate-500" />
-                  <span className="text-slate-700 font-bold text-sm">{t.slotsLeft} posti</span>
-                </div>
+                <button className="bg-[#CCFF00] text-black text-[11px] font-black px-4 py-2.5 rounded-[24px] active:bg-[#a6d100] transition-colors group-active:scale-95">
+                  Iscriviti
+                </button>
               </div>
-              
-              <div className="relative z-10 mt-1">
-                <div className="flex justify-between text-[10px] text-slate-500 font-bold mb-1.5">
-                  <span>{t.slots - t.slotsLeft}/{t.slots} iscritti</span>
-                  <span>{t.date}</span>
-                </div>
-                <div className="h-1 rounded-full bg-slate-100 overflow-hidden">
-                  <div className="h-full rounded-full bg-slate-900" style={{ width: `${fillPct}%` }} />
-                </div>
-              </div>
-              
-              <button className="relative z-10 mt-2 w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-900 font-bold text-sm py-2 rounded-xl transition-colors">
-                Iscriviti al torneo
-              </button>
             </div>
-          );
-        })}
+          </div>
+        ))}
         <div className="shrink-0 w-5" aria-hidden />
       </div>
     </section>

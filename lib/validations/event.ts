@@ -16,7 +16,7 @@ export const createEventSchema = z.object({
   location: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  maxPlayers: z.number().min(2, "Almeno 2 giocatori").max(30, "Massimo 30 giocatori"),
+  maxPlayers: z.number().min(1, "Almeno 1 giocatore").max(30, "Massimo 30 giocatori"),
   price: z.number().nullable().optional(),
   skillLevel: z.string().nullable().optional(),
   genderPreference: z.string().nullable().optional(),

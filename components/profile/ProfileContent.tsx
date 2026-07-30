@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSportDetails } from "@/lib/sports";
+import { getSportDetails, getSportIconUrl } from "@/lib/sports";
 
 interface EventData {
   id: string;
@@ -32,26 +32,26 @@ export function ProfileContent({
   ownedCircles
 }: ProfileContentProps) {
   return (
-    <div className="flex-1 px-4 pt-4 pb-24 flex flex-col gap-3 bg-white">
+    <div className="flex-1 px-4 pt-4 pb-24 flex flex-col gap-3 bg-[#0C0C0E]">
       {currentTab === 'partecipazioni' && (
         participations.length > 0 ? (
           participations.map(ev => {
             const sport = getSportDetails(ev.sport);
             return (
-              <Link href={`/events/${ev.id}`} key={ev.id} className="relative bg-white p-3 rounded-lg border border-slate-200 flex flex-col active:bg-slate-50 transition-colors overflow-hidden">
+              <Link href={`/events/${ev.id}`} key={ev.id} className="relative bg-[#16161A] p-3 rounded-[12px] border border-[#222226] hover:border-[#CCFF00]/50 flex flex-col active:bg-[#222226] transition-colors overflow-hidden">
                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${sport.color}`}></div>
                 <div className="pl-2">
                   <span className={`text-[9px] font-bold w-fit px-1.5 py-0.5 rounded uppercase mb-1 flex items-center gap-1 ${sport.pillColor} ${sport.pillText}`}>
-                    {sport.icon} {sport.label}
+                    <img src={getSportIconUrl(sport.id)} alt={sport.label} className="w-3 h-3 object-contain" /> {sport.label}
                   </span>
-                  <span className="font-bold text-slate-900 text-[13px] mb-0.5 block truncate">{ev.title}</span>
-                  <span className="text-[11px] text-slate-500 font-medium">{new Date(ev.dateStart).toLocaleDateString('it-IT')} • {ev.gym?.name || ev.location}</span>
+                  <span className="font-black text-white text-[14px] mb-0.5 block truncate">{ev.title}</span>
+                  <span className="text-[11px] text-[#8E8E93] font-medium">{new Date(ev.dateStart).toLocaleDateString('it-IT')} • {ev.gym?.name || ev.location}</span>
                 </div>
               </Link>
             );
           })
         ) : (
-          <div className="text-center p-6 text-slate-500 bg-white rounded-lg border border-dashed border-slate-300 mt-2">
+          <div className="text-center p-6 text-[#8E8E93] bg-[#16161A] rounded-[12px] border border-dashed border-[#222226] mt-2">
             <p className="text-[13px] font-medium">Nessun evento a cui partecipi.</p>
           </div>
         )
@@ -62,39 +62,26 @@ export function ProfileContent({
           createdEvents.map(ev => {
             const sport = getSportDetails(ev.sport);
             return (
-              <Link href={`/events/${ev.id}`} key={ev.id} className="relative bg-white p-3 rounded-lg border border-slate-200 flex flex-col active:bg-slate-50 transition-colors overflow-hidden">
+              <Link href={`/events/${ev.id}`} key={ev.id} className="relative bg-[#16161A] p-3 rounded-[12px] border border-[#222226] hover:border-[#CCFF00]/50 flex flex-col active:bg-[#222226] transition-colors overflow-hidden">
                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${sport.color}`}></div>
                 <div className="pl-2">
                   <span className={`text-[9px] font-bold w-fit px-1.5 py-0.5 rounded uppercase mb-1 flex items-center gap-1 ${sport.pillColor} ${sport.pillText}`}>
-                    {sport.icon} {sport.label}
+                    <img src={getSportIconUrl(sport.id)} alt={sport.label} className="w-3 h-3 object-contain" /> {sport.label}
                   </span>
-                  <span className="font-bold text-slate-900 text-[13px] mb-0.5 block truncate">{ev.title}</span>
-                  <span className="text-[11px] text-slate-500 font-medium">{new Date(ev.dateStart).toLocaleDateString('it-IT')} • {ev.gym?.name || ev.location}</span>
+                  <span className="font-black text-white text-[14px] mb-0.5 block truncate">{ev.title}</span>
+                  <span className="text-[11px] text-[#8E8E93] font-medium">{new Date(ev.dateStart).toLocaleDateString('it-IT')} • {ev.gym?.name || ev.location}</span>
                 </div>
               </Link>
             );
           })
         ) : (
-          <div className="text-center p-6 text-slate-500 bg-white rounded-lg border border-dashed border-slate-300 mt-2">
+          <div className="text-center p-6 text-[#8E8E93] bg-[#16161A] rounded-[12px] border border-dashed border-[#222226] mt-2">
             <p className="text-[13px] font-medium">Non hai ancora creato eventi.</p>
           </div>
         )
       )}
 
-      {currentTab === 'cerchie' && (
-        [...ownedCircles, ...circles].length > 0 ? (
-          [...ownedCircles, ...circles].map(circle => (
-            <div key={circle.id} className="bg-white p-3 rounded-lg border border-slate-200 flex flex-col">
-              <span className="font-bold text-slate-900 text-[13px] mb-0.5">{circle.name}</span>
-              <span className="text-[11px] text-slate-500 font-medium leading-relaxed">{circle.boardText}</span>
-            </div>
-          ))
-        ) : (
-          <div className="text-center p-6 text-slate-500 bg-white rounded-lg border border-dashed border-slate-300 mt-2">
-            <p className="text-[13px] font-medium">Non appartieni a nessuna cerchia.</p>
-          </div>
-        )
-      )}
+
     </div>
   );
 }

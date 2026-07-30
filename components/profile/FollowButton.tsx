@@ -10,9 +10,10 @@ interface FollowButtonProps {
   userId: string;
   initialIsFollowing: boolean;
   compact?: boolean;
+  isStructure?: boolean;
 }
 
-export function FollowButton({ userId, initialIsFollowing, compact = false }: FollowButtonProps) {
+export function FollowButton({ userId, initialIsFollowing, compact = false, isStructure = false }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -45,12 +46,14 @@ export function FollowButton({ userId, initialIsFollowing, compact = false }: Fo
       onClick={handleFollowToggle} 
       disabled={loading}
       variant={isFollowing ? "outline" : "default"}
-      className={`font-bold rounded-xl transition-all ${
+      className={`font-black uppercase tracking-wider rounded-xl transition-all ${
         compact ? "h-8 px-3 text-xs w-auto" : "w-full h-11"
       } ${
         isFollowing 
-          ? "border-slate-200 text-slate-700 hover:bg-slate-50" 
-          : "bg-slate-900 text-white hover:bg-slate-800"
+          ? "border border-[#222226] text-white hover:bg-[#16161A] bg-transparent" 
+          : isStructure 
+            ? "bg-[#00F0FF] text-black hover:bg-[#00d8e6]" 
+            : "bg-[#CCFF00] text-black hover:bg-[#b3ff00]"
       }`}
     >
       {loading ? (

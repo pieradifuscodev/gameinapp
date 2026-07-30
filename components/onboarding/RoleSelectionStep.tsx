@@ -7,56 +7,83 @@ interface RoleSelectionStepProps {
 }
 
 export function RoleSelectionStep({ role, setRole, onNext }: RoleSelectionStepProps) {
+  const currentAccent = role === "STRUTTURA" ? "#00F0FF" : "#CCFF00";
+
   return (
     <div className="flex flex-col gap-4 flex-1">
-      <h2 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2 uppercase tracking-wide">
+      <h2 className="text-xs font-bold text-white mb-2 flex items-center gap-2 uppercase tracking-wide">
         Seleziona Ruolo
       </h2>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
+        {/* SPORTIVO */}
         <div 
           onClick={() => setRole("SPORTIVO")}
-          className={`p-4 rounded-2xl cursor-pointer border-2 transition-all ${
-            role === "SPORTIVO" 
-            ? "border-primary bg-primary/5 shadow-sm" 
-            : "border-slate-100 hover:border-slate-200 bg-white"
-          }`}
+          className="p-4 rounded-2xl cursor-pointer border transition-all duration-300"
+          style={{
+            borderColor: role === "SPORTIVO" ? "#CCFF00" : "#222226",
+            backgroundColor: role === "SPORTIVO" ? "rgba(204, 255, 0, 0.08)" : "#0C0C0E"
+          }}
         >
           <div className="flex items-center gap-3 mb-1">
-            <div className={`p-2 rounded-full ${role === "SPORTIVO" ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
+            <div 
+              className="p-2 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: role === "SPORTIVO" ? "#CCFF00" : "#16161A",
+                color: role === "SPORTIVO" ? "#000000" : "#8E8E93"
+              }}
+            >
               <Activity size={20} />
             </div>
-            <h3 className={`font-black ${role === "SPORTIVO" ? "text-primary" : "text-slate-700"}`}>Sportivo</h3>
+            <h3 
+              className="font-black uppercase tracking-wide text-sm"
+              style={{ color: role === "SPORTIVO" ? "#CCFF00" : "#FFFFFF" }}
+            >
+              Sportivo
+            </h3>
           </div>
-          <p className={`text-xs font-medium pl-12 leading-relaxed ${role === "SPORTIVO" ? "text-primary/80" : "text-slate-500"}`}>
+          <p className="text-xs font-medium pl-12 leading-relaxed text-[#8E8E93]">
             Trova eventi, prenota campi, conosci nuove persone e organizza partite con gli amici.
           </p>
         </div>
 
+        {/* STRUTTURA */}
         <div 
           onClick={() => setRole("STRUTTURA")}
-          className={`p-4 rounded-2xl cursor-pointer border-2 transition-all ${
-            role === "STRUTTURA" 
-            ? "border-primary bg-primary/5 shadow-sm" 
-            : "border-slate-100 hover:border-slate-200 bg-white"
-          }`}
+          className="p-4 rounded-2xl cursor-pointer border transition-all duration-300"
+          style={{
+            borderColor: role === "STRUTTURA" ? "#00F0FF" : "#222226",
+            backgroundColor: role === "STRUTTURA" ? "rgba(0, 240, 255, 0.08)" : "#0C0C0E"
+          }}
         >
           <div className="flex items-center gap-3 mb-1">
-            <div className={`p-2 rounded-full ${role === "STRUTTURA" ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
+            <div 
+              className="p-2 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: role === "STRUTTURA" ? "#00F0FF" : "#16161A",
+                color: role === "STRUTTURA" ? "#000000" : "#8E8E93"
+              }}
+            >
               <Building2 size={20} />
             </div>
-            <h3 className={`font-black ${role === "STRUTTURA" ? "text-primary" : "text-slate-700"}`}>Organizzatore</h3>
+            <h3 
+              className="font-black uppercase tracking-wide text-sm"
+              style={{ color: role === "STRUTTURA" ? "#00F0FF" : "#FFFFFF" }}
+            >
+              Organizzatore
+            </h3>
           </div>
-          <p className={`text-xs font-medium pl-12 leading-relaxed ${role === "STRUTTURA" ? "text-primary/80" : "text-slate-500"}`}>
+          <p className="text-xs font-medium pl-12 leading-relaxed text-[#8E8E93]">
             Aggiungi la tua struttura sportiva, ricevi prenotazioni e gestisci i tuoi campi.
           </p>
         </div>
       </div>
 
-      <div className="mt-auto pt-4 flex justify-end">
+      <div className="mt-auto pt-6 flex justify-end">
         <button 
           onClick={onNext}
-          className="w-full py-3.5 rounded-xl bg-primary text-white font-bold text-base shadow-sm active:scale-[0.98] transition-transform"
+          className="w-full py-4 rounded-xl text-black font-black uppercase tracking-wider text-sm shadow-md active:scale-[0.98] transition-transform"
+          style={{ backgroundColor: currentAccent }}
         >
           Avanti
         </button>

@@ -68,34 +68,27 @@ export default function PreferencesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative pb-safe">
-      <header className="sticky top-0 z-10 bg-white shadow-sm px-4 py-4 flex items-center justify-between">
-        <Link href="/settings" className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
-          <ChevronLeft size={24} className="text-gray-800" />
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900">Preferenze</h1>
-        <div className="w-10"></div>
-      </header>
-
+    <div className="flex flex-col h-full bg-[#0C0C0E] relative pb-safe">
+      
       <div className="flex-1 p-4 pb-24 overflow-y-auto">
         {message && (
           <div className={`p-4 mb-4 rounded-xl flex items-start gap-3 border ${
-            message.type === 'error' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-primary/10 text-primary border-primary/20'
+            message.type === 'error' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-[#CCFF00]/10 text-[#CCFF00] border-[#CCFF00]/20'
           }`}>
             {message.type === 'error' ? <AlertCircle size={20} className="shrink-0 mt-0.5" /> : <CheckCircle2 size={20} className="shrink-0 mt-0.5" />}
-            <p className="text-sm font-medium">{message.text}</p>
+            <p className="text-sm font-bold">{message.text}</p>
           </div>
         )}
 
-        <section className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-wide">
-            <MapPin size={16} className="text-primary" /> Posizione e Raggio
+        <section className="bg-[#16161A] rounded-2xl p-4 border border-[#222226]">
+          <h2 className="text-sm font-black text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
+            <MapPin size={16} className="text-[#CCFF00]" /> Posizione e Raggio
           </h2>
           
           <div className="mb-6">
-            <label className="flex justify-between text-xs font-semibold text-gray-600 mb-2">
+            <label className="flex justify-between text-xs font-bold text-[#8E8E93] mb-2">
               <span>Distanza massima eventi</span>
-              <span className="text-primary font-bold">{maxNotificationDist} km</span>
+              <span className="text-[#CCFF00] font-black bg-[#CCFF00]/10 px-2.5 py-1 text-sm rounded-[8px]">{maxNotificationDist} km</span>
             </label>
             <input 
               type="range" 
@@ -105,18 +98,18 @@ export default function PreferencesPage() {
               onChange={(e) => setMaxNotificationDist(Number(e.target.value))}
               onMouseUp={handleUpdate}
               onTouchEnd={handleUpdate}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2 bg-[#222226] rounded-lg appearance-none cursor-pointer accent-[#CCFF00]"
             />
-            <p className="text-[10px] text-gray-400 mt-1">Vedrai eventi solo entro questo raggio.</p>
+            <p className="text-[10px] text-[#8E8E93] mt-2">Vedrai eventi solo entro questo raggio.</p>
           </div>
 
           <button 
             type="button"
             onClick={handleUpdateGPS}
             disabled={loading}
-            className="w-full py-3 bg-indigo-50 text-indigo-700 font-bold text-sm rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
+            className="w-full py-3 bg-[#222226] text-white hover:bg-[#2c2c31] font-bold text-sm rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform border border-[#222226]"
           >
-            <MapPin size={18} />
+            <MapPin size={18} className="text-[#CCFF00]" />
             Aggiorna Posizione Attuale
           </button>
         </section>

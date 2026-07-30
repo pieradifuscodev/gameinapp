@@ -22,7 +22,11 @@ type EventData = {
   creator: { id: string; name: string; surname: string; email: string; role: string };
 };
 
-export function FollowingFeed() {
+interface FollowingFeedProps {
+  coords: { lat: number; lng: number } | null;
+}
+
+export function FollowingFeed({ coords }: FollowingFeedProps) {
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +34,8 @@ export function FollowingFeed() {
   useEffect(() => {
     const fetchFollowingEvents = async () => {
       try {
-        const res = await fetch("/api/events/following");
+        const url = coords ? `/api/events/following?lat=${coords.lat}&lng=${coords.lng}` : `/api/events/following`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Impossibile caricare gli eventi");
         const data = await res.json();
         setEvents(data.events || []);
@@ -41,7 +46,7 @@ export function FollowingFeed() {
       }
     };
     fetchFollowingEvents();
-  }, []);
+  }, [coords]);
 
   if (loading) {
     return (
@@ -75,7 +80,7 @@ export function FollowingFeed() {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4 pb-[120px]">
+    <div className="flex flex-col gap-4 px-4 pt-28 pb-24">
       {events.map(event => (
         event.creator.role === "ORGANIZER" ? (
           <PromotedEventCard key={event.id} event={event} isBanner={false} />

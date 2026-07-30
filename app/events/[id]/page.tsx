@@ -2,13 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { getSportDetails } from "@/lib/sports";
 import EventClientActions from "@/components/events/EventClientActions";
-import { EventHero } from "@/components/events/details/EventHero";
 import { EventBadges } from "@/components/events/details/EventBadges";
 import { EventInfoCards } from "@/components/events/details/EventInfoCards";
 import { EventOrganizer } from "@/components/events/details/EventOrganizer";
 import { Card, CardContent } from "@/components/ui/card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import MapClientWrapper from "@/components/ui/MapClientWrapper";
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -33,13 +33,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const spotsLeft = event.maxPlayers - event.participants.length;
   const isFull = spotsLeft <= 0;
   const sport = getSportDetails(event.sport);
+  const mockupImage = `/images/sports/${sport.imageId}_mockup.png`;
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-[#0C0C0E]">
       
-      {/* ── TOP HEADER ── */}
-      <EventHero imageUrl={`/images/sports/${sport.imageId}.png`} sportLabel={sport.label} />
-
       {/* ── SCROLLABLE CONTENT ── */}
       <div className="flex-1 overflow-y-auto pb-24 pt-4">
         {/* ── TITLE & BADGES ── */}
@@ -49,15 +47,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           price={event.price} 
           skillLevel={event.skillLevel} 
           genderPreference={event.genderPreference} 
-          imageUrl={`/images/sports/${sport.imageId}.png`}
+          imageUrl={mockupImage}
           sportLabel={sport.label}
         />
 
       {/* ── DESCRIZIONE ── */}
       {event.description && (
         <div className="px-5 mb-5">
-          <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Descrizione</h3>
-          <p className="text-slate-900 text-[14px] leading-relaxed">{event.description}</p>
+          <h3 className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-wider mb-1">Descrizione</h3>
+          <p className="text-white text-[14px] leading-relaxed">{event.description}</p>
         </div>
       )}
 
@@ -72,6 +70,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         spotsLeft={spotsLeft}
         isFull={isFull}
       />
+
+      {/* ── MAPPA POSIZIONE EVENTO ── */}
+      {event.latitude && event.longitude && (
+        <div className="px-5 mb-6">
+          <h3 className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-wider mb-2">Posizione Campo</h3>
+          <div className="h-40 w-full rounded-xl overflow-hidden border border-[#222226] relative bg-[#0C0C0E] z-0">
+            <MapClientWrapper 
+              events={[event]} 
+              center={{ lat: event.latitude, lng: event.longitude }} 
+              radius={1} 
+            />
+          </div>
+        </div>
+      )}
 
       {/* ── STRUTTURA ── */}
       <EventOrganizer 

@@ -110,36 +110,30 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full bg-slate-50 relative pb-safe">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-white shadow-sm px-4 py-4 flex items-center justify-between">
-        <Link href="/dashboard" className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
-          <ChevronLeft size={24} className="text-gray-800" />
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900">Crea Evento</h1>
-        <div className="w-10"></div>
-      </header>
+  const accentColor = isOrganizer ? '#00F0FF' : '#CCFF00';
 
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full bg-[#0C0C0E] text-white relative pb-safe">
       <div className="flex-1 p-4 pb-32 overflow-y-auto flex flex-col gap-6">
         
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-red-50 text-red-700 border border-red-100 flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 flex items-start gap-3">
             <AlertCircle size={20} className="shrink-0 mt-0.5" />
-            <p className="text-sm font-medium">{errorMsg}</p>
+            <p className="text-sm font-semibold">{errorMsg}</p>
           </div>
         )}
 
         {/* Titolo */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Titolo Evento *</label>
+          <label className="block text-xs font-bold text-[#8E8E93] mb-1.5 uppercase tracking-wide">Titolo Evento *</label>
           <input 
             type="text" 
             {...register("title")}
             placeholder="es. Partita di calcetto serale"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/80 shadow-sm"
+            className="w-full bg-[#16161A] border border-[#222226] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-accent shadow-sm"
+            style={{ WebkitBoxShadow: 'none' }}
           />
-          {errors.title && <p className="text-red-500 text-xs mt-1.5">{errors.title.message}</p>}
+          {errors.title && <p className="text-red-500 text-xs mt-1.5 font-semibold">{errors.title.message}</p>}
         </div>
 
         {/* Sport (Componente Estratto) */}
@@ -147,20 +141,21 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
           value={sport} 
           onChange={(s) => setValue("sport", s, { shouldValidate: true })} 
           error={errors.sport?.message} 
+          isOrganizer={isOrganizer}
         />
 
         {/* Data e Ora */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
-            <Calendar size={16} className="text-gray-400" /> Data e Ora *
+          <label className="block text-xs font-bold text-[#8E8E93] mb-1.5 flex items-center gap-1.5 uppercase tracking-wide">
+            <Calendar size={14} style={{ color: accentColor }} /> Data e Ora *
           </label>
           <input 
             type="datetime-local" 
             min={minDateString}
             {...register("dateStart")}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/80 shadow-sm"
+            className="w-full bg-[#16161A] border border-[#222226] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-accent shadow-sm"
           />
-          {errors.dateStart && <p className="text-red-500 text-xs mt-1.5">{errors.dateStart.message}</p>}
+          {errors.dateStart && <p className="text-red-500 text-xs mt-1.5 font-semibold">{errors.dateStart.message}</p>}
         </div>
 
         {/* Luogo (Componente Estratto) */}
@@ -174,6 +169,7 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
             setValue("gymId", gymId);
           }}
           error={errors.location?.message}
+          isOrganizer={isOrganizer}
         />
 
         {/* Giocatori (Componente Estratto) */}
@@ -181,6 +177,7 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
           value={maxPlayers}
           onChange={(val) => setValue("maxPlayers", val, { shouldValidate: true })}
           error={errors.maxPlayers?.message}
+          isOrganizer={isOrganizer}
         />
 
         {/* Visibilità (Componente Estratto) */}
@@ -191,30 +188,31 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
           circleId={circleId}
           onCircleChange={(cid) => setValue("circleId", cid, { shouldValidate: true })}
           circleError={errors.circleId?.message}
+          isOrganizer={isOrganizer}
         />
 
         {/* Quota di Partecipazione */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-1.5">
-            <Banknote size={18} className="text-primary/80" /> Quota di partecipazione
+        <div className="bg-[#16161A] p-4 rounded-xl border border-[#222226] shadow-sm">
+          <h3 className="font-black text-white mb-3 flex items-center gap-1.5 uppercase tracking-wide text-xs">
+            <Banknote size={16} style={{ color: accentColor }} /> Quota di partecipazione
           </h3>
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">€</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93] font-bold">€</span>
               <input 
                 type="number" 
                 step="0.50"
                 min="0"
                 {...register("price", { valueAsNumber: true, setValueAs: v => v === "" ? null : parseFloat(v) })}
                 placeholder="0.00"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-bold outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/80"
+                className="w-full bg-[#0C0C0E] border border-[#222226] rounded-xl pl-8 pr-4 py-3.5 text-sm font-bold text-white outline-none focus:border-accent"
               />
             </div>
-            <div className="text-xs text-gray-500 font-medium whitespace-nowrap">
+            <div className="text-[11px] text-[#8E8E93] font-bold whitespace-nowrap">
               Lascia 0 o vuoto se gratis
             </div>
           </div>
-          {errors.price && <p className="text-red-500 text-xs mt-1.5">{errors.price.message}</p>}
+          {errors.price && <p className="text-red-500 text-xs mt-1.5 font-semibold">{errors.price.message}</p>}
         </div>
 
         {/* Preferenze (Componente Estratto) */}
@@ -223,32 +221,34 @@ export default function EventForm({ userRole, circles, gyms, eventId, initialDat
           onSkillLevelChange={(val) => setValue("skillLevel", val)}
           genderPreference={watch("genderPreference") ?? null}
           onGenderPreferenceChange={(val) => setValue("genderPreference", val)}
+          isOrganizer={isOrganizer}
         />
 
         {/* Descrizione */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Descrizione (Opzionale)</label>
+          <label className="block text-xs font-bold text-[#8E8E93] mb-1.5 uppercase tracking-wide">Descrizione (Opzionale)</label>
           <textarea 
             {...register("description")}
             rows={3}
             placeholder="Informazioni aggiuntive (es. portare palloni, quota campo...)"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/80 shadow-sm resize-none"
+            className="w-full bg-[#16161A] border border-[#222226] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-accent shadow-sm resize-none"
           />
         </div>
 
       </div>
 
       {/* Tasto Submit (Sticky in basso) */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 z-20">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#0C0C0E]/90 border-t border-[#222226] backdrop-blur-md z-20">
         <button
           type="submit"
           disabled={loading || (isPrivate && circles.length === 0)}
-          className="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-md active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100"
+          className="w-full text-black font-black uppercase tracking-wider py-4 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100"
+          style={{ backgroundColor: accentColor }}
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
           ) : (
-            <><Save size={20} /> {eventId ? "Salva Modifiche" : "Crea Evento"}</>
+            <><Save size={18} /> {eventId ? "Salva Modifiche" : "Crea Evento"}</>
           )}
         </button>
       </div>

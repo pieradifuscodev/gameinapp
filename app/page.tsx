@@ -12,6 +12,7 @@ import HomeHeader from "@/components/home/HomeHeader";
 import FilterModal from "@/components/home/FilterModal";
 import MapToggleButton from "@/components/home/MapToggleButton";
 import { FollowingFeed } from "@/components/home/FollowingFeed";
+import SkeletonEventCard from "@/components/ui/SkeletonEventCard";
 
 type EventData = {
   id: string;
@@ -85,87 +86,93 @@ export default function Home() {
     fetchEvents();
   }, [coords, radius, selectedSport, dateFilter, timeFilter]);
 
-  const promotedEvents = events.filter(e => e.creator.role === "ORGANIZER").slice(0, 5);
+  const promotedEvents = events.filter(e => e.creator.role === "STRUTTURA" || e.creator.role === "ORGANIZER").slice(0, 5);
 
   let filteredEvents = events;
-  if (filterType === "PRIVATE") filteredEvents = events.filter(e => e.creator.role !== "ORGANIZER");
-  if (filterType === "ORGANIZER") filteredEvents = events.filter(e => e.creator.role === "ORGANIZER");
+  if (filterType === "PRIVATE") filteredEvents = events.filter(e => e.creator.role !== "STRUTTURA" && e.creator.role !== "ORGANIZER");
+  if (filterType === "ORGANIZER") filteredEvents = events.filter(e => e.creator.role === "STRUTTURA" || e.creator.role === "ORGANIZER");
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     filteredEvents = filteredEvents.filter(e => e.title.toLowerCase().includes(q) || e.gym.name.toLowerCase().includes(q));
   }
 
   const renderEventCard = (event: EventData, isBanner = false) => {
-    if (event.creator.role !== "ORGANIZER") {
+    if (event.creator.role !== "STRUTTURA" && event.creator.role !== "ORGANIZER") {
       return <PrivateEventCard key={event.id} event={event} />;
     }
     return <PromotedEventCard key={event.id} event={event} isBanner={isBanner} />;
   };
 
   return (
-    <div className="flex flex-col bg-white flex-1 relative">
+    <div className="flex flex-col flex-1 relative bg-[#0C0C0E] w-full">
       <HomeHeader 
         greeting={greeting}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         hasFilters={filterType !== 'ALL' || selectedSport !== null || dateFilter !== 'ALL' || timeFilter !== 'ALL'}
         onOpenFilter={() => setIsFilterOpen(true)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
 
-      {/* ── TABS ── */}
-      <div className="px-4 py-2 flex items-center gap-4 border-b border-slate-100">
-        <button 
-          onClick={() => setActiveTab("EXPLORE")}
-          className={`pb-3 border-b-2 text-[15px] font-bold transition-colors ${activeTab === 'EXPLORE' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-        >
-          Esplora
-        </button>
-        <button 
-          onClick={() => setActiveTab("FOLLOWING")}
-          className={`pb-3 border-b-2 text-[15px] font-bold transition-colors ${activeTab === 'FOLLOWING' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-        >
-          Seguiti
-        </button>
-      </div>
+
 
       {activeTab === "FOLLOWING" ? (
-        <FollowingFeed />
+        <FollowingFeed coords={coords} />
       ) : loading ? (
-        <div className="p-8 flex flex-col items-center justify-center min-h-[40vh] text-slate-400">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-slate-900 mb-4" />
-          <p className="font-bold text-sm">Ricerca in corso...</p>
+        <div className="flex flex-col gap-8 pt-28 pb-24">
+          <section>
+            <div className="mb-2 px-4 flex items-center gap-2">
+              <div className="h-6 w-32 bg-[#16161A] rounded animate-pulse"></div>
+            </div>
+            <div className="flex overflow-x-hidden gap-3 pb-2 px-4">
+              <SkeletonEventCard />
+              <SkeletonEventCard />
+              <SkeletonEventCard />
+            </div>
+          </section>
+          <section>
+            <div className="mb-2 px-4 flex items-center gap-2">
+              <div className="h-6 w-40 bg-[#16161A] rounded animate-pulse"></div>
+            </div>
+            <div className="flex overflow-x-hidden gap-3 pb-2 px-4">
+              <SkeletonEventCard />
+              <SkeletonEventCard />
+              <SkeletonEventCard />
+            </div>
+          </section>
         </div>
       ) : error ? (
-        <div className="mx-4 my-4 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-[13px] flex flex-col gap-3">
+        <div className="mx-4 my-4 p-4 bg-[#16161A] text-red-500 rounded-xl border border-red-500/20 text-[13px] flex flex-col gap-3">
           <div className="flex gap-2 items-start">
             <AlertCircle size={20} className="shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
           {geoError && (
-            <button onClick={retryGeo} className="flex items-center justify-center gap-1.5 self-start text-xs font-bold text-red-700 bg-red-100 active:bg-red-200 px-3 py-1.5 rounded-lg transition-colors">
+            <button onClick={retryGeo} className="flex items-center justify-center gap-1.5 self-start text-xs font-black text-black bg-[#CCFF00] px-4 py-2 rounded-[24px] transition-colors">
               <RefreshCw size={12} /> Riprova
             </button>
           )}
         </div>
       ) : isMapView ? (
-        <div className="flex-1 relative min-h-[50vh]">
+        <div className="w-full h-[calc(100dvh-230px)] min-h-[400px] relative">
           {coords ? (
-            <div className="absolute inset-0">
+            <div className="absolute inset-x-0 bottom-0 top-[110px] w-full">
               <MapWrapper events={filteredEvents} center={coords} radius={radius} />
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-slate-400 font-medium">Posizione non disponibile</div>
+            <div className="flex-1 flex items-center justify-center text-slate-400 font-medium pt-28">Posizione non disponibile</div>
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-8 pt-4 pb-[120px]">
+        <div className="flex flex-col gap-8 pt-28 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
           
           {/* Promozioni (Strutture) */}
           {!searchQuery && promotedEvents.length > 0 && (
             <section>
-              <div className="mb-2 px-4 flex items-center gap-1.5">
-                <TrendingUp size={16} className="text-amber-500" />
-                <h2 className="font-bold text-slate-900 text-[17px]">In Evidenza</h2>
+              <div className="mb-3 px-4 flex items-center gap-1.5">
+                <TrendingUp size={18} className="text-[#CCFF00]" />
+                <h2 className="font-black text-white text-[19px] tracking-tight">In Evidenza</h2>
               </div>
               <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 snap-x px-4 scroll-px-4">
                 {promotedEvents.map(event => renderEventCard(event, true))}
@@ -176,21 +183,24 @@ export default function Home() {
 
           {/* Eventi in zona */}
           <section>
-            <div className="mb-2 px-4 flex justify-between items-end">
+            <div className="mb-3 px-4 flex justify-between items-center">
               <div>
-                <h2 className="font-bold text-slate-900 text-[17px]">Eventi in Zona</h2>
+                <h2 className="font-black text-white text-[19px] tracking-tight">Eventi in Zona</h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <div className="flex items-center gap-1 text-[11px] text-slate-700 font-bold bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
+                  <div className="flex items-center gap-1 text-[11px] text-[#8E8E93] font-bold bg-[#16161A] border border-[#222226] px-2 py-0.5 rounded-md">
                     <MapPin size={10} /> Entro {radius} km
                   </div>
                 </div>
               </div>
+              <Link href="/categories" className="text-xs font-black uppercase tracking-wider text-[#CCFF00] hover:underline">
+                Vedi Tutti
+              </Link>
             </div>
 
             {filteredEvents.length === 0 ? (
-              <div className="mx-4 p-8 bg-slate-50 rounded-2xl border border-dashed border-slate-300 text-center mt-2">
-                <p className="text-slate-500 text-sm font-medium mb-4">Nessun evento in zona per questa categoria.</p>
-                <Link href="/events/new" className="bg-slate-900 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm inline-flex items-center gap-2 active:bg-slate-800 transition-colors">
+              <div className="mx-4 p-8 bg-[#16161A] rounded-[12px] border border-[#222226] text-center mt-2">
+                <p className="text-[#8E8E93] text-sm font-medium mb-4">Nessun evento in zona per questa categoria.</p>
+                <Link href="/events/new" className="bg-[#CCFF00] text-black font-black px-6 py-3 rounded-[24px] shadow-sm inline-flex items-center gap-2 active:bg-[#a6d100] transition-colors">
                   <Plus size={16} /> Creane uno tu!
                 </Link>
               </div>
